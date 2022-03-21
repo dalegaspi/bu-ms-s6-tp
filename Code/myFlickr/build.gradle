@@ -1,10 +1,25 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    ext {
+        ktlint_version = '0.44.0'
+    }
+}
+
 plugins {
     id 'com.android.application' version '7.1.2' apply false
     id 'com.android.library' version '7.1.2' apply false
     id 'org.jetbrains.kotlin.android' version '1.6.10' apply false
+    id 'com.diffplug.spotless' version '5.8.2'
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+
+spotless {
+    kotlin {
+        target("**/*.kt")
+        ktlint(ktlint_version).userData([disabled_rules: "no-wildcard-imports"])
+    }
+    kotlinGradle {
+        target("*.gradle.kts", "additionalScripts/*.gradle.kts")
+        ktlint(ktlint_version).userData([disabled_rules: "no-wildcard-imports"])
+    }
 }

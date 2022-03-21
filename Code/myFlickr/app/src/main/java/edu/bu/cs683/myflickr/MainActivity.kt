@@ -3,15 +3,20 @@ package edu.bu.cs683.myflickr
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.flickr4java.flickr.Flickr
+import com.flickr4java.flickr.REST
 import com.github.scribejava.apis.FlickrApi
 import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuth1RequestToken
+import com.github.scribejava.core.model.OAuthRequest
+import com.github.scribejava.core.model.Verb
 import com.github.scribejava.core.oauth.OAuth10aService
 
 /**
@@ -42,8 +47,17 @@ class MainActivity : AppCompatActivity() {
     fun getAccessToken() {
         object : AsyncTask<Void, Void, OAuth1AccessToken>() {
             override fun doInBackground(vararg p0: Void?): OAuth1AccessToken? {
-                accessToken
-                return service.getAccessToken(requestToken, verifier)
+                accessToken =
+                    service.getAccessToken(requestToken, verifier)
+
+                val request = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
+                request.addQuerystringParameter("method", "flickr.test.login")
+                request.addQuerystringParameter("format", "json")
+                request.addQuerystringParameter("nojsoncallback", "1")
+                service.signRequest(accessToken, request)
+                val response = service.execute(request).body
+                Log.d(TAG, "user = $response")
+                return accessToken
             }
 
             override fun onPostExecute(result: OAuth1AccessToken) {
@@ -59,7 +73,9 @@ class MainActivity : AppCompatActivity() {
     inner class FlickrGetAuthUrlTask : AsyncTask<Void, Void, String>() {
         override fun doInBackground(vararg params: Void?): String? {
 
-            val requestToken = service.getRequestToken()
+            val flickr = Flickr(APIKEY, APISECRET, REST())
+            val authInterface = flickr.authInterface
+            requestToken = authInterface.getRequestToken("https://www.flickr.com/auth-72157720836323165")
             val authURL = service.getAuthorizationUrl(requestToken)
 
             return authURL
@@ -70,7 +86,8 @@ class MainActivity : AppCompatActivity() {
                 override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                     // check for our custom callback protocol otherwise use default behavior
                     if (url != null) {
-                        if (url.startsWith("oauth")) {
+                        if (url.contains("oauth_verifier")) {
+                            // if (url.startsWith("oauth")) {
                             // authorization complete hide webview for now.
                             webview.setVisibility(View.GONE)
 
@@ -91,5 +108,9 @@ class MainActivity : AppCompatActivity() {
                 webview.loadUrl(authURL)
             }
         }
+    }
+
+    companion object {
+        val TAG: String = MainActivity::class.java.simpleName
     }
 }

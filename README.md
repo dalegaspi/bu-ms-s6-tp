@@ -1,3 +1,3 @@
-# METCS683 Project
-
-My name is Dexter Legaspi taking the BU MET Master's Degree in Software Development.  
+# METCS683 Project 
+ 
+- [Interation 0](https://github.com/CS683/metcs683projects-dalegaspi/releases/tag/Iteration-00)

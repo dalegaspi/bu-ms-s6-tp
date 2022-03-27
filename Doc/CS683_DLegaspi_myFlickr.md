@@ -3,6 +3,24 @@
 Dexter Legaspi (dlegaspi@bu.edu)  
 BU MET MSSD
 
+- [Overview](#overview)
+- [Related Work](#related-work)
+  * [Essential](#essential)
+  * [Desirable](#desirable)
+  * [Optional](#optional)
+- [Requirement Analysis and Testing](#requirement-analysis-and-testing)
+- [Design and Implementation](#design-and-implementation)
+  * [Basic Architecture](#basic-architecture)
+  * [UI Design and Implementation](#ui-design-and-implementation)
+  * [Third-Party APIs](#third-party-apis)
+  * [Data Design and Implementation](#data-design-and-implementation)
+- [Project Structure](#project-structure)
+- [Timeline](#timeline)
+- [Future Work (Optional)](#future-work--optional-)
+- [Lessons Learned](#lessons-learned)
+  * [Iteration 0](#iteration-0)
+- [References](#references)
+
 ## Overview
 
 I have been an avid photographer since I was in high school when my mother purchased my first Pentax SLR.  The advent of digital technology lending itself to the advancement of photography has further helped on improving my craft since I also work in the computer field.  There are a million applications (desktop and mobile alike) for photography and I have benefitted from most of them, and I would like to pay it forward with a contribution of my own for anyone who wants to improve in their craft.
@@ -25,25 +43,31 @@ It would be nice to have some push notifications for any likes or increased view
 
 ## Requirement Analysis and Testing 
 
-*(This section should clearly describe all features/requirements that you plan to implement or have implemented for your application. You should separate them into three categories: essential, desirable and optional.
- 
-|Title<br>(Essential/Desirable/Optional) |  |
+
+|Title(Essential/Desirable/Optional) | Authentication (Essential) |
 |---|---|
-|Description|  |
-|Mockups| |
-|Acceptance Tests| |
-|Test Results| |
+|Description|As a user, I will be able to authenticate using my existing Flickr credentials  |
+|Mockups| ![](OAuth_Login@0.5x.png)|
+|Acceptance Tests| User will be able to log in using Flickr credentials and have the opportunity to authorize the app to access his/her account and images |
+|Test Results| TBD |
+|Status| Iteration 1: Integrated with Flickr OAuth API|
+
+| Title(Essential/Desirable/Optional)| View Images as Grid (Essential) |
+|---|---|
+|Description|As a user, I should be able to have an option to view all my images in my account as a grid |
+|Mockups| ![](Image_Grid@0.5x.png)|
+|Acceptance Tests| User can display all of his/her images in a grid|
+|Test Results| TBD |
 |Status| |
 
-For example: 
-
-|Title(Essential/Desirable/Optional)<br> |View project details (Essential)|
+| Title(Essential/Desirable/Optional)| View Images as Individual (Essential) |
 |---|---|
-|Description|As a user, I want to view the details of a project so that I can have a better idea about that project.  |
-|Mockups|You can put one or more mockups here. |
-|Acceptance Tests|Given a project list is shown on the screen, <br> When the user clicks on one project on the list, <br>Then the project details will be displayed on the screen, including project title, brief description, implementation stack, authors, keywords, project links, etc.|
-|Test Results| You can provide some screenshots of the execution result.|
-|Status|Iteration 1: implemented the project detail UI page <br> Iteration 2: Implemented User click event<br> Iteration 3: Implemented project database. Completed. |)* 
+|Description|As a user, I should be able to have an option to view all my images in my account individually with the option of having the metadata as overlay |
+|Mockups| ![](Single_Image@0.5x.png) |
+|Acceptance Tests| User can display all of his/her images individually with metadata optionally as overlay|
+|Test Results| TBD |
+|Status| |
+
 
 ## Design and Implementation
 
@@ -64,11 +88,14 @@ As mentioned, we are going to leverage a lot of the Flickr API and this will be 
 A lot of the data will come via the Flickr API and will certainly leverage the available methods to get the images and metadata and it search aspects.  The rest will be using a local database (SQLite) for more efficient filtering of metadata.
 
 ## Project Structure
-*(Please provide a screenshot(s) of your current project structure, which should show all the packages, kotlin/java files and resource files in your project. You should also highlight any files/packages you have changed, added/deleted in this iteration compared with the previous iteration. This is not needed for iteration 0)*
-    
-## Timeline
 
-*(Please provide  a summary of the requirements implemented and Android/third party components used in the past and current iterations, and the plan in the future iteration.)*
+This is the initial directory structure of the project.  It only has the basic classes and artifacts that are generated using Android Studio IDE.  The Gradle script has been modified to add Third Party License references and Spotless plugin.
+
+
+![](dir.png)
+
+
+## Timeline
 
 |Iteration | Application Requirements (Eseential/Desirable/Optional) | Android Components and Features| 
 |---|---|---|
@@ -81,11 +108,15 @@ A lot of the data will come via the Flickr API and will certainly leverage the a
 ## Future Work (Optional)
 *(This section can describe possible future works. Particularly the requirements you planned but didn’t get time to implement, and possible Android components or features to implement them. 
 This section is optional, and you can include this section in the final iteration if you want.)*
-
     
 ##Project Demo Links
 *(For on campus students, we will have project presentations in class. For online students, you are required to submit a video of your project presentation which includes a demo of your app. You can use Kaltura to make the video and then submit it on blackboard. Please check the following link for the details of using Kaltura to make and submit videos on blackboard. You can also use other video tools and upload your video to youtube if you like: https://onlinecampus.bu.edu/bbcswebdav/courses/00cwr_odeelements/metcs/cs_Kaltura.htm  )*
 
+## Lessons Learned
+
+### Iteration 0
+- OAuth 1.0a integration is difficult nowadays because most implementations are in 2.x.  Unfortunately, Flickr API is using 1.x   
+- I learned that Since Android 3, apps cannot execute network-related tasks in the UI thread, which prompted me to having to learn about `AsyncTask` (which apparently has been recently deprecated) to geth the OAuth integration to work.  
 
 ## References
 

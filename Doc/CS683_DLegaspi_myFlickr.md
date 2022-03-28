@@ -29,7 +29,7 @@ Flickr is one of the first established and popular photography websites, and hav
 
 ## Building the project
 
-The project uses Gradle, and issuing the `gradle build` command should suffice in building the app.  However, prior to building the application, it will require to have the Flickr API key in the `gradle.properties` file:  
+The project uses Gradle, and issuing the `gradle build` command should suffice in building the app.  However, prior to building the application, it will require to have the Flickr API key in the `local.properties` file:  
 
 ```properties
 flickr.api.key=$YOUR_API_KEY
@@ -114,6 +114,7 @@ This is the initial directory structure of the project.  It only has the basic c
 |4| | |
 |5| | |
 
+
 ## Future Work (Optional)
 *(This section can describe possible future works. Particularly the requirements you planned but didn’t get time to implement, and possible Android components or features to implement them. 
 This section is optional, and you can include this section in the final iteration if you want.)*
@@ -121,11 +122,15 @@ This section is optional, and you can include this section in the final iteratio
 ##Project Demo Links
 *(For on campus students, we will have project presentations in class. For online students, you are required to submit a video of your project presentation which includes a demo of your app. You can use Kaltura to make the video and then submit it on blackboard. Please check the following link for the details of using Kaltura to make and submit videos on blackboard. You can also use other video tools and upload your video to youtube if you like: https://onlinecampus.bu.edu/bbcswebdav/courses/00cwr_odeelements/metcs/cs_Kaltura.htm  )*
 
-## Lessons Learned
+## Lessons Learned and Other Notes
 
 ### Iteration 0
 - OAuth 1.0a integration is difficult nowadays because most implementations are in 2.x.  Unfortunately, Flickr API is using 1.x   
-- I learned that Since Android 3, apps cannot execute network-related tasks in the UI thread, which prompted me to having to learn about `AsyncTask` (which apparently has been recently deprecated) to geth the OAuth integration to work.  
+- I learned that Since Android 3, apps cannot execute network-related tasks in the UI thread, which prompted me to having to learn about `AsyncTask` (which apparently has been recently deprecated) to geth the OAuth integration to work.    
+
+### Iteration 1
+- Per my facilitator's feedback, I removed the API key/secret in the code and instead leveraged having them as part of the local.properties file so that they are injected at buildtime via the auto-generated `BuildConfig` class.
+- The current way of saving state right now is very rudimentary but mimics the way Lab 2 had done it: via the static component of a data class.  This of course will change in future iteration as I learn more in the coming weeks.
 
 ## References
 

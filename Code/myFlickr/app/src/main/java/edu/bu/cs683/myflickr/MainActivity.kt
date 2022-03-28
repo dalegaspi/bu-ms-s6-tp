@@ -1,5 +1,6 @@
 package edu.bu.cs683.myflickr
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
@@ -24,14 +25,15 @@ import com.github.scribejava.core.oauth.OAuth10aService
  */
 class MainActivity : AppCompatActivity() {
 
-    val APIKEY = "9f6312e4c2267993ed1555c1e53b7e9a"
-    val APISECRET = "da07bc0f98be24dd"
+    val APIKEY = BuildConfig.FLICKR_API_KEY
+    val APISECRET = BuildConfig.FLICKR_API_SECRET
 
     lateinit var webview: WebView
     lateinit var service: OAuth10aService
     lateinit var verifier: String
     lateinit var requestToken: OAuth1RequestToken
     lateinit var accessToken: OAuth1AccessToken
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -44,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         FlickrGetAuthUrlTask().execute()
     }
 
+    @SuppressLint("StaticFieldLeak")
     fun getAccessToken() {
         object : AsyncTask<Void, Void, OAuth1AccessToken>() {
             override fun doInBackground(vararg p0: Void?): OAuth1AccessToken? {

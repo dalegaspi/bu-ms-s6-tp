@@ -14,6 +14,12 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+        buildConfigField "String", "FLICKR_API_KEY", "\"${properties.getProperty('flickr.api.key')}\""
+        buildConfigField "String", "FLICKR_API_SECRET", "\"${properties.getProperty('flickr.api.secret')}\""
     }
 
     buildTypes {
@@ -29,6 +35,8 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+
 }
 
 dependencies {

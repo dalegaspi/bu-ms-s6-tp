@@ -27,6 +27,15 @@ I have been an avid photographer since I was in high school when my mother purch
 
 Flickr is one of the first established and popular photography websites, and have been instrumental with my learning finding images of other people around the world.  Flickr is a photography website, but it is more geared towards the social aspects of it: followers, groups and sharing of images.  These are important, but it is equally important to look at one's own catalog without the noise, and see how he/she has improved.  This is the focus the app: hence the name "myFlickr":  to focus on **my** images and have a fresh perspective on them.  It would have the usual images viewer but the browser would be more optimized for quick browsing with the metadata (which the official app doesn't do today); there will be minimal features geared towards the social/sharing and more tools to filter and inspect your own images--e.g., there will be search and filtering based on the metadata of the images
 
+## Building the project
+
+The project uses Gradle, and issuing the `gradle build` command should suffice in building the app.  However, prior to building the application, it will require to have the Flickr API key in the `gradle.properties` file:  
+
+```properties
+flickr.api.key=$YOUR_API_KEY
+flickr.api.secret=$YOUR_SECRET_KEY
+```
+
 ## Related Work
 
 ### Essential 

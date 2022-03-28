@@ -4,6 +4,7 @@ Dexter Legaspi (dlegaspi@bu.edu)
 BU MET MSSD
 
 - [Overview](#overview)
+- [Building the project](#building-the-project)
 - [Related Work](#related-work)
   * [Essential](#essential)
   * [Desirable](#desirable)
@@ -17,9 +18,12 @@ BU MET MSSD
 - [Project Structure](#project-structure)
 - [Timeline](#timeline)
 - [Future Work (Optional)](#future-work--optional-)
-- [Lessons Learned](#lessons-learned)
+- [Lessons Learned and Other Notes](#lessons-learned-and-other-notes)
   * [Iteration 0](#iteration-0)
+  * [Iteration 1](#iteration-1)
+  * [Screenshots](#screenshots)
 - [References](#references)
+
 
 ## Overview
 
@@ -131,6 +135,19 @@ This section is optional, and you can include this section in the final iteratio
 ### Iteration 1
 - Per my facilitator's feedback, I removed the API key/secret in the code and instead leveraged having them as part of the local.properties file so that they are injected at buildtime via the auto-generated `BuildConfig` class.
 - The current way of saving state right now is very rudimentary but mimics the way Lab 2 had done it: via the static component of a data class.  This of course will change in future iteration as I learn more in the coming weeks.
+- Right now there are 2 activities: MainActivity and ImageActivity.  The way the user information (user ID) is passed between the two activities using `intent.putExtra`
+- I was compelled to introduce the use of Adapters (`PhotosAdapter`) to build the initial grid of images that uses RecyclerView.  This was further made complicated by the fact there is no trivial way to call `getViewById` in an Adapter.  Fortunately, I have found an alternate way using [View Binding](https://developer.android.com/topic/libraries/view-binding#setup).
+- Layouts has continued to eat up the most time on development.  While the image grid is working, the gaps between rows are huge and I have yet to find out why that is and how to reduce it.
+
+### Screenshots
+
+Login/Authorize App via Flickr OAuth
+
+![](auth.png)
+
+Images Grid
+
+![](grid.png)
 
 ## References
 

@@ -4,6 +4,7 @@ Dexter Legaspi (dlegaspi@bu.edu)
 BU MET MSSD
 
 - [Overview](#overview)
+- [Building the project](#building-the-project)
 - [Related Work](#related-work)
   * [Essential](#essential)
   * [Desirable](#desirable)
@@ -17,15 +18,27 @@ BU MET MSSD
 - [Project Structure](#project-structure)
 - [Timeline](#timeline)
 - [Future Work (Optional)](#future-work--optional-)
-- [Lessons Learned](#lessons-learned)
+- [Lessons Learned and Other Notes](#lessons-learned-and-other-notes)
   * [Iteration 0](#iteration-0)
+  * [Iteration 1](#iteration-1)
+  * [Screenshots](#screenshots)
 - [References](#references)
+
 
 ## Overview
 
 I have been an avid photographer since I was in high school when my mother purchased my first Pentax SLR.  The advent of digital technology lending itself to the advancement of photography has further helped on improving my craft since I also work in the computer field.  There are a million applications (desktop and mobile alike) for photography and I have benefitted from most of them, and I would like to pay it forward with a contribution of my own for anyone who wants to improve in their craft.
 
 Flickr is one of the first established and popular photography websites, and have been instrumental with my learning finding images of other people around the world.  Flickr is a photography website, but it is more geared towards the social aspects of it: followers, groups and sharing of images.  These are important, but it is equally important to look at one's own catalog without the noise, and see how he/she has improved.  This is the focus the app: hence the name "myFlickr":  to focus on **my** images and have a fresh perspective on them.  It would have the usual images viewer but the browser would be more optimized for quick browsing with the metadata (which the official app doesn't do today); there will be minimal features geared towards the social/sharing and more tools to filter and inspect your own images--e.g., there will be search and filtering based on the metadata of the images
+
+## Building the project
+
+The project uses Gradle, and issuing the `gradle build` command should suffice in building the app.  However, prior to building the application, it will require to have the Flickr API key in the `local.properties` file:  
+
+```properties
+flickr.api.key=$YOUR_API_KEY
+flickr.api.secret=$YOUR_SECRET_KEY
+```
 
 ## Related Work
 
@@ -105,6 +118,7 @@ This is the initial directory structure of the project.  It only has the basic c
 |4| | |
 |5| | |
 
+
 ## Future Work (Optional)
 *(This section can describe possible future works. Particularly the requirements you planned but didn’t get time to implement, and possible Android components or features to implement them. 
 This section is optional, and you can include this section in the final iteration if you want.)*
@@ -112,11 +126,28 @@ This section is optional, and you can include this section in the final iteratio
 ##Project Demo Links
 *(For on campus students, we will have project presentations in class. For online students, you are required to submit a video of your project presentation which includes a demo of your app. You can use Kaltura to make the video and then submit it on blackboard. Please check the following link for the details of using Kaltura to make and submit videos on blackboard. You can also use other video tools and upload your video to youtube if you like: https://onlinecampus.bu.edu/bbcswebdav/courses/00cwr_odeelements/metcs/cs_Kaltura.htm  )*
 
-## Lessons Learned
+## Lessons Learned and Other Notes
 
 ### Iteration 0
 - OAuth 1.0a integration is difficult nowadays because most implementations are in 2.x.  Unfortunately, Flickr API is using 1.x   
-- I learned that Since Android 3, apps cannot execute network-related tasks in the UI thread, which prompted me to having to learn about `AsyncTask` (which apparently has been recently deprecated) to geth the OAuth integration to work.  
+- I learned that Since Android 3, apps cannot execute network-related tasks in the UI thread, which prompted me to having to learn about `AsyncTask` (which apparently has been recently deprecated) to geth the OAuth integration to work.    
+
+### Iteration 1
+- Per my facilitator's feedback, I removed the API key/secret in the code and instead leveraged having them as part of the local.properties file so that they are injected at buildtime via the auto-generated `BuildConfig` class.
+- The current way of saving state right now is very rudimentary but mimics the way Lab 2 had done it: via the static component of a data class.  This of course will change in future iteration as I learn more in the coming weeks.
+- Right now there are 2 activities: MainActivity and ImageActivity.  The way the user information (user ID) is passed between the two activities using `intent.putExtra`
+- I was compelled to introduce the use of Adapters (`PhotosAdapter`) to build the initial grid of images that uses RecyclerView.  This was further made complicated by the fact there is no trivial way to call `getViewById` in an Adapter.  Fortunately, I have found an alternate way using [View Binding](https://developer.android.com/topic/libraries/view-binding#setup).
+- Layouts has continued to eat up the most time on development.  While the image grid is working, the gaps between rows are huge and I have yet to find out why that is and how to reduce it.
+
+### Screenshots
+
+Login/Authorize App via Flickr OAuth
+
+![](auth.png)
+
+Images Grid
+
+![](grid.png)
 
 ## References
 

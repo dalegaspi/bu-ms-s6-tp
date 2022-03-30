@@ -1,5 +1,7 @@
 package edu.bu.cs683.myflickr
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
@@ -11,27 +13,30 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.flickr4java.flickr.Flickr
 import com.flickr4java.flickr.REST
+import com.flickr4java.flickr.photos.SearchParameters
 import com.github.scribejava.apis.FlickrApi
 import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuth1RequestToken
-import com.github.scribejava.core.model.OAuthRequest
-import com.github.scribejava.core.model.Verb
 import com.github.scribejava.core.oauth.OAuth10aService
+import edu.bu.cs683.myflickr.data.FlickrApiState
 
 /**
  * @author dlegaspi@bu.edu
  */
 class MainActivity : AppCompatActivity() {
 
-    val APIKEY = "9f6312e4c2267993ed1555c1e53b7e9a"
-    val APISECRET = "da07bc0f98be24dd"
+    val APIKEY = BuildConfig.FLICKR_API_KEY
+    val APISECRET = BuildConfig.FLICKR_API_SECRET
 
     lateinit var webview: WebView
     lateinit var service: OAuth10aService
     lateinit var verifier: String
     lateinit var requestToken: OAuth1RequestToken
-    lateinit var accessToken: OAuth1AccessToken
+    lateinit var flickr: Flickr
+    lateinit var userId: String
+
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -40,23 +45,29 @@ class MainActivity : AppCompatActivity() {
         webview.settings.domStorageEnabled = true
         service = ServiceBuilder(APIKEY)
             .apiSecret(APISECRET)
-            .build(FlickrApi.instance(FlickrApi.FlickrPerm.DELETE))
-        FlickrGetAuthUrlTask().execute()
+            .build(FlickrApi.instance(FlickrApi.FlickrPerm.READ))
+
+        FlickrGetAuthUrlTask(this).execute()
     }
 
+    @SuppressLint("StaticFieldLeak")
     fun getAccessToken() {
         object : AsyncTask<Void, Void, OAuth1AccessToken>() {
             override fun doInBackground(vararg p0: Void?): OAuth1AccessToken? {
-                accessToken =
+                val accessToken =
                     service.getAccessToken(requestToken, verifier)
 
-                val request = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
-                request.addQuerystringParameter("method", "flickr.test.login")
-                request.addQuerystringParameter("format", "json")
-                request.addQuerystringParameter("nojsoncallback", "1")
-                service.signRequest(accessToken, request)
-                val response = service.execute(request).body
-                Log.d(TAG, "user = $response")
+                val authInterface = flickr.authInterface.checkToken(accessToken)
+                val user = authInterface.user
+                userId = user.id
+                Log.d(TAG, "user = ${user.realName}")
+
+                // let's set our API state holder
+                FlickrApiState.instance = FlickrApiState(user, flickr, accessToken)
+                val photosInterface = flickr.photosInterface
+                val searchParameters = SearchParameters()
+                searchParameters.userId = user.id
+                val photos = photosInterface.search(searchParameters, 5, 1)
                 return accessToken
             }
 
@@ -67,14 +78,16 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
             }
-        }.execute()
+        }.execute().get()
     }
 
-    inner class FlickrGetAuthUrlTask : AsyncTask<Void, Void, String>() {
+    inner class FlickrGetAuthUrlTask(val activity: MainActivity) : AsyncTask<Void, Void, String>() {
+
         override fun doInBackground(vararg params: Void?): String? {
 
-            val flickr = Flickr(APIKEY, APISECRET, REST())
+            flickr = Flickr(APIKEY, APISECRET, REST())
             val authInterface = flickr.authInterface
+            authInterface
             requestToken = authInterface.getRequestToken("https://www.flickr.com/auth-72157720836323165")
             val authURL = service.getAuthorizationUrl(requestToken)
 
@@ -94,8 +107,12 @@ class MainActivity : AppCompatActivity() {
                             val uri = Uri.parse(url)
                             verifier = uri.getQueryParameter("oauth_verifier")!!
 
-                            getAccessToken()
+                            getAccessToken() // i extract the token here
 
+                            // launch to the Images Activity
+                            val intent = Intent(activity, ImagesActivity::class.java)
+                            intent.putExtra("user_id", userId)
+                            startActivity(intent)
                             return true
                         }
                     }

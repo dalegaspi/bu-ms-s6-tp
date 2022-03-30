@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                             val uri = Uri.parse(url)
                             verifier = uri.getQueryParameter("oauth_verifier")!!
 
-                            getAccessToken()
+                            getAccessToken() // i extract the token here
 
                             // launch to the Images Activity
                             val intent = Intent(activity, ImagesActivity::class.java)

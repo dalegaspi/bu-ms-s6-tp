@@ -48,7 +48,7 @@ class ImagesActivity : AppCompatActivity() {
 
             override fun onPostExecute(photos: MutableList<Photo>) {
                 recyclerView = findViewById(R.id.photosRecyclerView)
-                val layoutManager = GridLayoutManager(this@ImagesActivity, 1)
+                val layoutManager = GridLayoutManager(this@ImagesActivity, 2)
                 recyclerView.layoutManager = layoutManager
                 recyclerView.adapter = PhotosAdapter(photos)
             }

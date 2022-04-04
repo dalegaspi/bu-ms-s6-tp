@@ -27,7 +27,7 @@ class AuthErrorFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = FragmentAuthErrorBinding.inflate(inflater, container, false)
 
-        binding.textErrorString.text = "Unable to authenticate with Flickr due to invalid API keys."
+        binding.textErrorString.text = "Unable to authenticate with Flickr due to API authentication errors (probably invalid API keys)."
 
         binding.exitApplicationButton.setOnClickListener {
             activity?.finish()

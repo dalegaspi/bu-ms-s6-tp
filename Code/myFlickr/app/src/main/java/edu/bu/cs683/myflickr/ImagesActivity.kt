@@ -1,6 +1,7 @@
 package edu.bu.cs683.myflickr
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.os.AsyncTask
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -30,6 +31,10 @@ class ImagesActivity : AppCompatActivity() {
         loadImages()
     }
 
+    fun getGridSize(): Int {
+        return if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 3 else 2
+    }
+
     @SuppressLint("StaticFieldLeak")
     fun loadImages() {
         object : AsyncTask<Void, Void, MutableList<Photo>>() {
@@ -39,7 +44,7 @@ class ImagesActivity : AppCompatActivity() {
                 val searchParameters = SearchParameters()
 
                 searchParameters.userId = intent.extras?.get("user_id") as String?
-                val photos = photosInterface.search(searchParameters, 24, 2)
+                val photos = photosInterface.search(searchParameters, 24, 1)
                     .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
                     .toMutableList()
 
@@ -48,7 +53,7 @@ class ImagesActivity : AppCompatActivity() {
 
             override fun onPostExecute(photos: MutableList<Photo>) {
                 recyclerView = findViewById(R.id.photosRecyclerView)
-                val layoutManager = GridLayoutManager(this@ImagesActivity, 2)
+                val layoutManager = GridLayoutManager(this@ImagesActivity, getGridSize())
                 recyclerView.layoutManager = layoutManager
                 recyclerView.adapter = PhotosAdapter(photos)
             }

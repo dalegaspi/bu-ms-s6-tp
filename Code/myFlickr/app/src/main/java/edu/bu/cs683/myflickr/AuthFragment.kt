@@ -146,6 +146,7 @@ class AuthFragment : Fragment() {
 
                 parentFragmentManager.commit {
                     replace<AuthErrorFragment>(R.id.container)
+
                 }
             }
         }

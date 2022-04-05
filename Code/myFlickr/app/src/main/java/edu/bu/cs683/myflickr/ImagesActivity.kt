@@ -1,18 +1,9 @@
 package edu.bu.cs683.myflickr
 
-import android.annotation.SuppressLint
-import android.content.res.Configuration
-import android.os.AsyncTask
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.flickr4java.flickr.Flickr
-import com.flickr4java.flickr.REST
-import com.flickr4java.flickr.photos.SearchParameters
-import edu.bu.cs683.myflickr.data.Photo
-import edu.bu.cs683.myflickr.data.PhotosAdapter
-
+import androidx.fragment.app.commit
+import androidx.fragment.app.replace
 /**
  * This is where all the images stuff will be done; all the related fragments
  * will be using this activity
@@ -21,42 +12,16 @@ import edu.bu.cs683.myflickr.data.PhotosAdapter
  */
 class ImagesActivity : AppCompatActivity() {
 
-    lateinit var recyclerView: RecyclerView
     lateinit var userId: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_images)
         userId = intent.extras?.get("user_id") as String
 
-        loadImages()
-    }
-
-    fun getGridSize(): Int {
-        return if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 3 else 2
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    fun loadImages() {
-        object : AsyncTask<Void, Void, MutableList<Photo>>() {
-            override fun doInBackground(vararg p0: Void?): MutableList<Photo> {
-                val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
-                val photosInterface = flickr.photosInterface
-                val searchParameters = SearchParameters()
-
-                searchParameters.userId = intent.extras?.get("user_id") as String?
-                val photos = photosInterface.search(searchParameters, 24, 1)
-                    .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
-                    .toMutableList()
-
-                return photos
-            }
-
-            override fun onPostExecute(photos: MutableList<Photo>) {
-                recyclerView = findViewById(R.id.photosRecyclerView)
-                val layoutManager = GridLayoutManager(this@ImagesActivity, getGridSize())
-                recyclerView.layoutManager = layoutManager
-                recyclerView.adapter = PhotosAdapter(photos)
-            }
-        }.execute()
+        val args = Bundle()
+        args.putString(ImageGridFragment.ARG_USER_ID, userId)
+        supportFragmentManager.commit {
+            replace<ImageGridFragment>(R.id.container, args = args)
+        }
     }
 }

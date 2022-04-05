@@ -4,10 +4,10 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.AsyncTask
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.flickr4java.flickr.Flickr
@@ -15,8 +15,6 @@ import com.flickr4java.flickr.REST
 import com.flickr4java.flickr.photos.SearchParameters
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.data.PhotosAdapter
-import edu.bu.cs683.myflickr.databinding.FragmentAuthBinding
-import edu.bu.cs683.myflickr.databinding.FragmentAuthErrorBinding
 import edu.bu.cs683.myflickr.databinding.FragmentImageGridBinding
 
 /**
@@ -39,7 +37,8 @@ class ImageGridFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentImageGridBinding.inflate(inflater, container, false)

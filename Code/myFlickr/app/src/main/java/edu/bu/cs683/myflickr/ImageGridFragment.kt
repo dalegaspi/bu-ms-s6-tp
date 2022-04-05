@@ -4,10 +4,13 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
+import androidx.fragment.app.replace
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.flickr4java.flickr.Flickr
@@ -22,7 +25,7 @@ import edu.bu.cs683.myflickr.databinding.FragmentImageGridBinding
  *
  * @author dlegaspi@bu.edu
  */
-class ImageGridFragment : Fragment() {
+class ImageGridFragment : Fragment(), OneImageDetailListener {
     private var _binding: FragmentImageGridBinding? = null
     private val binding get() = _binding!!
 
@@ -72,7 +75,7 @@ class ImageGridFragment : Fragment() {
                 recyclerView = binding.photosRecyclerView
                 val layoutManager = GridLayoutManager(context, getGridSize())
                 recyclerView.layoutManager = layoutManager
-                recyclerView.adapter = PhotosAdapter(photos)
+                recyclerView.adapter = PhotosAdapter(this@ImageGridFragment, photos)
             }
         }.execute()
     }
@@ -81,5 +84,15 @@ class ImageGridFragment : Fragment() {
         const val ARG_USER_ID = "user_id"
 
         val TAG: String = ImageGridFragment::class.java.simpleName
+    }
+
+    override fun getImageDetails(photo: Photo) {
+        Log.i(TAG, "Loading image ${photo.id}")
+        val args = Bundle()
+        args.putString(OneImageFragment.ARG_IMAGE_ID, photo.id)
+        parentFragmentManager.commit {
+            replace<OneImageFragment>(R.id.container, args = args)
+            addToBackStack(null)
+        }
     }
 }

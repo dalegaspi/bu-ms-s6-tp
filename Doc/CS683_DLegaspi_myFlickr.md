@@ -21,6 +21,7 @@ BU MET MSSD
 - [Lessons Learned and Other Notes](#lessons-learned-and-other-notes)
   * [Iteration 0](#iteration-0)
   * [Iteration 1](#iteration-1)
+  * [Iteration 2](#iteration-2)
   * [Screenshots](#screenshots)
 - [References](#references)
 
@@ -65,13 +66,29 @@ It would be nice to have some push notifications for any likes or increased view
 |Test Results| TBD |
 |Status| Iteration 1: Integrated with Flickr OAuth API|
 
-| Title(Essential/Desirable/Optional)| View Images as Grid (Essential) |
+|Title(Essential/Desirable/Optional) | Graceful Error Exit (Essential) |
 |---|---|
-|Description|As a user, I should be able to have an option to view all my images in my account as a grid |
-|Mockups| ![](Image_Grid@0.5x.png)|
-|Acceptance Tests| User can display all of his/her images in a grid|
+|Description| The app should present a clear message when the API key is not set correctly and have the user the means to exit the application gracefully. |
+|Mockups| |
+|Acceptance Tests| User sees "Unable to authenticate with Flickr due to invalid API keys." and a button to be able to exit the application gracefully. |
 |Test Results| TBD |
-|Status| |
+|Status| Iteration 2: Fully implemented|
+
+| Title(Essential/Desirable/Optional)| View Images as Grid Portrait Orientation (Essential) |
+|---|---|
+|Description|As a user, I should be able to have an option to view all my images in my account as a grid with 2 images per column |
+|Mockups| ![](Image_Grid@0.5x.png)|
+|Acceptance Tests| User can display all of his/her images in a grid with 2 images per column|
+|Test Results| TBD |
+|Status| Iteration 1: Fully implemented|
+
+| Title(Essential/Desirable/Optional)| View Images as Grid Landscape Mode (Essential) |
+|---|---|
+|Description|As a user, I should be able to have an option to view all my images in my account as a grid with 3 images per column |
+|Mockups| ![](Image_Grid@0.5x.png)|
+|Acceptance Tests| User can display all of his/her images in a grid with 3 images per column|
+|Test Results| TBD |
+|Status| Iteration 2: Fully implemented|
 
 | Title(Essential/Desirable/Optional)| View Images as Individual (Essential) |
 |---|---|
@@ -79,8 +96,15 @@ It would be nice to have some push notifications for any likes or increased view
 |Mockups| ![](Single_Image@0.5x.png) |
 |Acceptance Tests| User can display all of his/her images individually with metadata optionally as overlay|
 |Test Results| TBD |
-|Status| |
+|Status| Iteration 2: Fully implemented|
 
+| Title(Essential/Desirable/Optional)| Pinch to Zoom on Individual Image(Essential) |
+|---|---|
+|Description|As a user, I should be able to pinch to zoom on an individual image |
+|Mockups| |
+|Acceptance Tests| User can pinch to zoom on image|
+|Test Results| TBD |
+|Status| Iteration 2: Fully implemented|
 
 ## Design and Implementation
 
@@ -105,7 +129,7 @@ A lot of the data will come via the Flickr API and will certainly leverage the a
 This is the initial directory structure of the project.  It only has the basic classes and artifacts that are generated using Android Studio IDE.  The Gradle script has been modified to add Third Party License references and Spotless plugin.
 
 
-![](dir.png)
+![](dir3.png)
 
 
 ## Timeline
@@ -113,7 +137,7 @@ This is the initial directory structure of the project.  It only has the basic c
 |Iteration | Application Requirements (Eseential/Desirable/Optional) | Android Components and Features| 
 |---|---|---|
 |1|Authentication and Basic Image Browsing | Using Network connectivity and WebView for OAuth Handshake, using Flickr REST APIs|
-|2| | |
+|2|Individual Image browsing (with Pinch to Zoom) and Graceful exit on API error|Fragments and RecyclerView|
 |3| | |
 |4| | |
 |5| | |
@@ -139,17 +163,42 @@ This section is optional, and you can include this section in the final iteratio
 - I was compelled to introduce the use of Adapters (`PhotosAdapter`) to build the initial grid of images that uses RecyclerView.  This was further made complicated by the fact there is no trivial way to call `getViewById` in an Adapter.  Fortunately, I have found an alternate way using [View Binding](https://developer.android.com/topic/libraries/view-binding#setup).
 - Layouts has continued to eat up the most time on development.  While the image grid is working, the gaps between rows are huge and I have yet to find out why that is and how to reduce it.
 
+
+### Iteration 2
+- Per my facilitator's feedback, the application now displays a different fragment on the main activity in an event of API keys not set up correctly (or any API integration errors for that matter) and have a button that allows exiting the app gracefully and not just crash:
+
+```kotlin
+binding.textErrorString.text = "Unable to authenticate with Flickr due to API authentication errors (probably Invalid API keys)."
+
+binding.exitApplicationButton.setOnClickListener {
+  activity?.finish()
+}
+```
+
+- The application now takes full advantage of fragments and view bindings.  Lab 3 has been _instrumental_ in understanding how it all works and was able to apply the knowledge for this iteration.
+- Layouts still a challenge although it's a bit manageable than before.
+
+
 ### Screenshots
 
 Login/Authorize App via Flickr OAuth
 
 ![](auth.png)
 
-Images Grid
+Images Grid (Portrait)
 
-![](grid.png)
+![](grid-portrait.png)
+
+Exit Application Due to Invalid API Keys
+
+![](exit.png)
+
+Single Image Browsing
+
+![](oneimage.png)
 
 ## References
 
 - [Flickr API Documentation](https://www.flickr.com/services/api/)
 - [OAuth 1.0a](https://oauth.net/core/1.0a/)
+

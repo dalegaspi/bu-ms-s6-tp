@@ -4,9 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import edu.bu.cs683.myflickr.OneImageDetailListener
 import edu.bu.cs683.myflickr.databinding.PhotoBinding
 
-class PhotosAdapter(val photos: MutableList<Photo> = mutableListOf()) : RecyclerView.Adapter<PhotosAdapter.PhotosViewHolder>() {
+class PhotosAdapter(val oneImageDetailListener: OneImageDetailListener, private val photos: MutableList<Photo> = mutableListOf()) : RecyclerView.Adapter<PhotosAdapter.PhotosViewHolder>() {
     val IMAGE_SIDE_PX = 400
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotosViewHolder {
@@ -24,8 +25,14 @@ class PhotosAdapter(val photos: MutableList<Photo> = mutableListOf()) : Recycler
                     .load(url)
                     .into(binding.imageView)
             }
+
+            contentView.setOnClickListener {
+                oneImageDetailListener.getImageDetails(photos[position])
+            }
         }
     }
 
-    inner class PhotosViewHolder(val binding: PhotoBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class PhotosViewHolder(val binding: PhotoBinding) : RecyclerView.ViewHolder(binding.root) {
+        val contentView = binding.imageView
+    }
 }

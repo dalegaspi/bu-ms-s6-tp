@@ -3,6 +3,10 @@ buildscript {
     ext {
         ktlint_version = '0.44.0'
     }
+
+    repositories {
+        maven { url "https://www.jitpack.io" }
+    }
 }
 
 plugins {
@@ -11,6 +15,7 @@ plugins {
     id 'org.jetbrains.kotlin.android' version '1.6.10' apply false
     id 'com.diffplug.spotless' version '5.8.2'
 }
+
 
 
 spotless {

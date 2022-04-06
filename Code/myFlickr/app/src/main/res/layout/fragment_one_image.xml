@@ -22,9 +22,15 @@ android:id="@+id/relativelayout"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"  tools:context=".OneImageFragment">
 
+    <!--
     <ImageView
         android:id="@+id/oneImageView"
         android:scaleType="fitCenter"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+-->
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/oneImageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

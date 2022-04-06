@@ -21,6 +21,7 @@ BU MET MSSD
 - [Lessons Learned and Other Notes](#lessons-learned-and-other-notes)
   * [Iteration 0](#iteration-0)
   * [Iteration 1](#iteration-1)
+  * [Iteration 2](#iteration-2)
   * [Screenshots](#screenshots)
 - [References](#references)
 
@@ -95,8 +96,15 @@ It would be nice to have some push notifications for any likes or increased view
 |Mockups| ![](Single_Image@0.5x.png) |
 |Acceptance Tests| User can display all of his/her images individually with metadata optionally as overlay|
 |Test Results| TBD |
-|Status| |
+|Status| Iteration 2: Fully implemented|
 
+| Title(Essential/Desirable/Optional)| Pinch to Zoom on Individual Image(Essential) |
+|---|---|
+|Description|As a user, I should be able to pinch to zoom on an individual image |
+|Mockups| |
+|Acceptance Tests| User can pinch to zoom on image|
+|Test Results| TBD |
+|Status| Iteration 2: Fully implemented|
 
 ## Design and Implementation
 
@@ -121,7 +129,7 @@ A lot of the data will come via the Flickr API and will certainly leverage the a
 This is the initial directory structure of the project.  It only has the basic classes and artifacts that are generated using Android Studio IDE.  The Gradle script has been modified to add Third Party License references and Spotless plugin.
 
 
-![](dir2.png)
+![](dir3.png)
 
 
 ## Timeline
@@ -129,7 +137,7 @@ This is the initial directory structure of the project.  It only has the basic c
 |Iteration | Application Requirements (Eseential/Desirable/Optional) | Android Components and Features| 
 |---|---|---|
 |1|Authentication and Basic Image Browsing | Using Network connectivity and WebView for OAuth Handshake, using Flickr REST APIs|
-|2|Individual Image browsing and Graceful exit on API error|Fragments|
+|2|Individual Image browsing (with Pinch to Zoom) and Graceful exit on API error|Fragments and RecyclerView|
 |3| | |
 |4| | |
 |5| | |
@@ -167,7 +175,7 @@ binding.exitApplicationButton.setOnClickListener {
 }
 ```
 
-- The application takes full advantage of fragments and view bindings.  Lab 3 has been _instrumental_ in understanding how it all works and was able to apply the knowledge for this iteration.
+- The application now takes full advantage of fragments and view bindings.  Lab 3 has been _instrumental_ in understanding how it all works and was able to apply the knowledge for this iteration.
 - Layouts still a challenge although it's a bit manageable than before.
 
 
@@ -184,6 +192,10 @@ Images Grid (Portrait)
 Exit Application Due to Invalid API Keys
 
 ![](exit.png)
+
+Single Image Browsing
+
+![](oneimage.png)
 
 ## References
 

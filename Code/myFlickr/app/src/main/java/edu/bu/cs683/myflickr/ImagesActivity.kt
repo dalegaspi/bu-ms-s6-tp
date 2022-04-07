@@ -23,5 +23,8 @@ class ImagesActivity : AppCompatActivity() {
         supportFragmentManager.commit {
             replace<ImageGridFragment>(R.id.container, args = args)
         }
+
+        // remove title bar
+        supportActionBar?.hide()
     }
 }

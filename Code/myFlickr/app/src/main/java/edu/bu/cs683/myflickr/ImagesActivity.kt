@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
+import edu.bu.cs683.myflickr.fragment.ImageGridFragment
+
 /**
  * This is where all the images stuff will be done; all the related fragments
  * will be using this activity

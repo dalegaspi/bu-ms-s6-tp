@@ -1,4 +1,4 @@
-package edu.bu.cs683.myflickr
+package edu.bu.cs683.myflickr.fragment
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -24,6 +24,10 @@ import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuth1RequestToken
 import com.github.scribejava.core.oauth.OAuth10aService
+import edu.bu.cs683.myflickr.BuildConfig
+import edu.bu.cs683.myflickr.ImagesActivity
+import edu.bu.cs683.myflickr.MainActivity
+import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.data.FlickrApiState
 import edu.bu.cs683.myflickr.databinding.FragmentAuthBinding
 /**

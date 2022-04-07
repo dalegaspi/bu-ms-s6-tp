@@ -138,9 +138,9 @@ This is the initial directory structure of the project.  It only has the basic c
 |---|---|---|
 |1|Authentication and Basic Image Browsing | Using Network connectivity and WebView for OAuth Handshake, using Flickr REST APIs|
 |2|Individual Image browsing (with Pinch to Zoom) and Graceful exit on API error|Fragments and RecyclerView|
-|3| | |
-|4| | |
-|5| | |
+|3|Saving of Auth Token to Device, Previous/Next Browsing on Individual Images | ViewModel, StorageProvider, SharedPreferences|
+|4|Infinite Scrolling, Image filtering Based on Tags | |
+|5|Save/Load of Image Filters| |
 
 
 ## Future Work (Optional)

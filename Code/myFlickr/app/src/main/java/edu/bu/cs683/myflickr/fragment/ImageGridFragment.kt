@@ -1,4 +1,4 @@
-package edu.bu.cs683.myflickr
+package edu.bu.cs683.myflickr.fragment
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
@@ -16,8 +16,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flickr4java.flickr.Flickr
 import com.flickr4java.flickr.REST
 import com.flickr4java.flickr.photos.SearchParameters
+import edu.bu.cs683.myflickr.BuildConfig
+import edu.bu.cs683.myflickr.listener.OneImageDetailListener
+import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.data.Photo
-import edu.bu.cs683.myflickr.data.PhotosAdapter
+import edu.bu.cs683.myflickr.adapter.PhotosAdapter
 import edu.bu.cs683.myflickr.databinding.FragmentImageGridBinding
 
 /**
@@ -35,7 +38,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            userId = it.getString(Companion.ARG_USER_ID)
+            userId = it.getString(ARG_USER_ID)
         }
     }
 
@@ -51,8 +54,15 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
         return binding.root
     }
 
-    fun getGridSize(): Int {
-        return if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 3 else 2
+    /**
+     * Gets the image grid column per row depending on orientation
+     * of the phone screen
+     */
+    fun getGridColumnsPerRow(): Int {
+        return if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+            ROWS_PER_COLUMN_LANDSCAPE
+        else
+            ROWS_PER_COLUMN_PORTRAIT
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -64,7 +74,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
                 val searchParameters = SearchParameters()
 
                 searchParameters.userId = userId
-                val photos = photosInterface.search(searchParameters, 24, 1)
+                val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, 1)
                     .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
                     .toMutableList()
 
@@ -72,8 +82,11 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             }
 
             override fun onPostExecute(photos: MutableList<Photo>) {
+                // build the recycler view and bind the adapter to it so we
+                // can draw the individual images from the photo metadata
+                // returned by the API
                 recyclerView = binding.photosRecyclerView
-                val layoutManager = GridLayoutManager(context, getGridSize())
+                val layoutManager = GridLayoutManager(context, getGridColumnsPerRow())
                 recyclerView.layoutManager = layoutManager
                 recyclerView.adapter = PhotosAdapter(this@ImageGridFragment, photos)
             }
@@ -82,11 +95,15 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
 
     companion object {
         const val ARG_USER_ID = "user_id"
+        const val GRID_PAGE_SIZE = 24
+        const val ROWS_PER_COLUMN_PORTRAIT = 2
+        const val ROWS_PER_COLUMN_LANDSCAPE = 3
 
         val TAG: String = ImageGridFragment::class.java.simpleName
     }
 
     override fun getImageDetails(photo: Photo) {
+        // Load the fragment to
         Log.i(TAG, "Loading image ${photo.id}")
         val args = Bundle()
         args.putString(OneImageFragment.ARG_IMAGE_ID, photo.id)

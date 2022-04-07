@@ -1,4 +1,4 @@
-package edu.bu.cs683.myflickr
+package edu.bu.cs683.myflickr.fragment
 
 import android.annotation.SuppressLint
 import android.os.AsyncTask
@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import com.flickr4java.flickr.Flickr
 import com.flickr4java.flickr.REST
 import com.squareup.picasso.Picasso
+import edu.bu.cs683.myflickr.BuildConfig
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.databinding.FragmentOneImageBinding
 
@@ -28,8 +29,8 @@ class OneImageFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            userId = it.getString(OneImageFragment.ARG_USER_ID)
-            imageId = it.getString(OneImageFragment.ARG_IMAGE_ID)
+            userId = it.getString(ARG_USER_ID)
+            imageId = it.getString(ARG_IMAGE_ID)
         }
     }
 

@@ -23,4 +23,4 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./Code/myFlickr/gradlew
     - name: Build with Gradle
-      run: ./Code/myFlickr/gradlew build
+      run: cd ./Code/myFlickr && ./gradlew build

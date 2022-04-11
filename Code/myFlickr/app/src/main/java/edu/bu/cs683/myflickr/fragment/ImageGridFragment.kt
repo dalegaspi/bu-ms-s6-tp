@@ -13,6 +13,7 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.replace
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.flickr4java.flickr.Flickr
 import com.flickr4java.flickr.REST
@@ -51,9 +52,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     ): View? {
         _binding = FragmentImageGridBinding.inflate(inflater, container, false)
 
-        userId?.let {
-            loadImages()
-        }
+
 
         return binding.root
     }
@@ -65,7 +64,9 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
         val listViewModel =
             ViewModelProvider(this).get(ImagesViewModel::class.java)
 
-
+        userId?.let {
+            loadImages()
+        }
     }
 
     /**
@@ -105,7 +106,11 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
                 // can draw the individual images from the photo metadata
                 // returned by the API
                 recyclerView = binding.photosRecyclerView
-                val layoutManager = GridLayoutManager(context, getGridColumnsPerRow())
+                val columnCount = getGridColumnsPerRow()
+                val layoutManager = when {
+                    columnCount <= 1 -> LinearLayoutManager(context)
+                    else -> GridLayoutManager(context, columnCount)
+                }
                 recyclerView.layoutManager = layoutManager
                 recyclerView.adapter = PhotosAdapter(this@ImageGridFragment, listViewModel.currentImagesList.value!!.toMutableList())
             }

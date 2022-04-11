@@ -26,7 +26,8 @@ class PhotosAdapter(val oneImageDetailListener: OneImageDetailListener, private 
                 // in one go.
                 Picasso.get()
                     .load(url)
-                    .fit().centerCrop()
+                    .fit()
+                    .centerCrop()
                     .into(binding.imageView)
             }
 

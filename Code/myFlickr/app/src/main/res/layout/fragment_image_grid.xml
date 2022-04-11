@@ -25,7 +25,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="#222222"
             app:layout_scrollFlags="scroll|enterAlways">
 
             <ImageView
@@ -55,6 +55,15 @@
                 android:paddingVertical="16dp"
                 android:src="@drawable/poll"
                 tools:src="@drawable/poll" />
+            <ImageView
+                android:id="@+id/showAppSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:src="@drawable/cog_outline"
+                tools:src="@drawable/cog_outline" />
 
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>

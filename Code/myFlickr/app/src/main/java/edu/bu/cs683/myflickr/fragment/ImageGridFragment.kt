@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.flickr4java.flickr.Flickr
@@ -22,6 +23,7 @@ import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.adapter.PhotosAdapter
 import edu.bu.cs683.myflickr.databinding.FragmentImageGridBinding
+import edu.bu.cs683.myflickr.viewmodel.ImagesViewModel
 
 /**
  * Fragment for Image grid
@@ -49,9 +51,21 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     ): View? {
         _binding = FragmentImageGridBinding.inflate(inflater, container, false)
 
-        userId?.let { loadImages() }
+        userId?.let {
+            loadImages()
+        }
 
         return binding.root
+    }
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val listViewModel =
+            ViewModelProvider(this).get(ImagesViewModel::class.java)
+
+
     }
 
     /**
@@ -82,13 +96,18 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             }
 
             override fun onPostExecute(photos: MutableList<Photo>) {
+                val listViewModel =
+                    ViewModelProvider(this@ImageGridFragment).get(ImagesViewModel::class.java)
+
+                listViewModel.setImagesList(photos)
+
                 // build the recycler view and bind the adapter to it so we
                 // can draw the individual images from the photo metadata
                 // returned by the API
                 recyclerView = binding.photosRecyclerView
                 val layoutManager = GridLayoutManager(context, getGridColumnsPerRow())
                 recyclerView.layoutManager = layoutManager
-                recyclerView.adapter = PhotosAdapter(this@ImageGridFragment, photos)
+                recyclerView.adapter = PhotosAdapter(this@ImageGridFragment, listViewModel.currentImagesList.value!!.toMutableList())
             }
         }.execute()
     }

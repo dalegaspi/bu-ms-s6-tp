@@ -89,6 +89,14 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             savePrefs()
             redraw()
         }
+
+        binding.showAnalytics.setOnClickListener {
+            // also add the user id in the fragment
+            parentFragmentManager.commit {
+                replace<StatsFragment>(R.id.container)
+                addToBackStack(null)
+            }
+        }
     }
 
     fun savePrefs() {

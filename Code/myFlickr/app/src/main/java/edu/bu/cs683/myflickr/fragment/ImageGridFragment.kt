@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Switch
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
@@ -19,11 +20,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flickr4java.flickr.Flickr
 import com.flickr4java.flickr.REST
 import com.flickr4java.flickr.photos.SearchParameters
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import edu.bu.cs683.myflickr.BuildConfig
 import edu.bu.cs683.myflickr.listener.OneImageDetailListener
 import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.adapter.PhotosAdapter
+import edu.bu.cs683.myflickr.data.PhotoRepository
 import edu.bu.cs683.myflickr.databinding.FragmentImageGridBinding
 import edu.bu.cs683.myflickr.viewmodel.ImagesViewModel
 
@@ -97,6 +100,35 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
                 addToBackStack(null)
             }
         }
+
+        binding.showAppSettings.setOnClickListener {
+            showAppOptions()
+        }
+    }
+
+
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
+    fun showAppOptions() {
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        bottomSheetDialog.setContentView(R.layout.options_layout)
+
+        val switchShowAsGrid = bottomSheetDialog.findViewById<Switch>(R.id.showAsGrid)
+
+        switchShowAsGrid ?. let {
+            it.isChecked = isGrid
+            it.setOnCheckedChangeListener { _, b ->
+                isGrid = b
+                savePrefs()
+                bottomSheetDialog.dismiss()
+                redraw()
+            }
+        }
+
+        bottomSheetDialog.findViewById<Switch>(R.id.showMetadata)?.setOnCheckedChangeListener { _, _ ->
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.show()
     }
 
     fun savePrefs() {
@@ -157,6 +189,10 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
                     .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
                     .toMutableList()
 
+                photos.forEach {
+                    PhotoRepository.get().add(it)
+                }
+
                 return photos
             }
 
@@ -185,7 +221,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
         const val IMAGE_GRID_PREFS = "ImageGridPrefs"
         const val IMAGE_IS_GRID = "ImagesIsGrid"
         const val ARG_USER_ID = "user_id"
-        const val GRID_PAGE_SIZE = 24
+        const val GRID_PAGE_SIZE = 50
         const val ROWS_PER_COLUMN_PORTRAIT = 2
         const val ROWS_PER_COLUMN_LANDSCAPE = 3
 

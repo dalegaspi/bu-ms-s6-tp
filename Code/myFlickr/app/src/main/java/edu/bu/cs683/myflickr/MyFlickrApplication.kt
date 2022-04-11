@@ -1,6 +1,7 @@
 package edu.bu.cs683.myflickr
 
 import android.app.Application
+import edu.bu.cs683.myflickr.data.PhotoRepository
 
 /**
  * The entry point
@@ -10,5 +11,6 @@ import android.app.Application
 class MyFlickrApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        PhotoRepository.initialize(this)
     }
 }

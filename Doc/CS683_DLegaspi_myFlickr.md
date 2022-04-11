@@ -22,6 +22,7 @@ BU MET MSSD
   * [Iteration 0](#iteration-0)
   * [Iteration 1](#iteration-1)
   * [Iteration 2](#iteration-2)
+  * [Iteration 3](#iteration-3)
   * [Screenshots](#screenshots)
 - [References](#references)
 
@@ -162,7 +163,8 @@ This is the initial directory structure of the project.  It only has the basic c
 |---|---|---|
 |1|Authentication and Basic Image Browsing | Using Network connectivity and WebView for OAuth Handshake, using Flickr REST APIs|
 |2|Individual Image browsing (with Pinch to Zoom) and Graceful exit on API error|Fragments and RecyclerView|
-|3|Toolbars, Storing of Data in Local database, Charts | ViewModel, StorageProvider, Database|
+|3|Toolbars, Storing of Data in Local database, Charts,
+Preferences | ViewModel, SharedPreferences, Database|
 |4|Infinite Scrolling, Image filtering Based on Tags | |
 |5|Save/Load of Image Filters| |
 
@@ -207,9 +209,12 @@ binding.exitApplicationButton.setOnClickListener {
 
 - Added more comments in the code per facilitator's feedback 😊
 - Much research is done on the library to be used for the charts/statistics.  The data are mostly not wired yet but should provide some clues on what the final will look like
-- Some significant work is done on the auto-hiding Toolbar.  Most of the information out there are outdated and the recent AndroidX Framework actually made this very easy now, it's just a matter of finding the information
+- I learned that in Android there is the AppBar, ActionBar, and ToolBar and MaterialDesign has design guidance for all three.  It's confusing and seem convoluted.  Some significant work is done on the auto-hiding Toolbar.  Most of the information out there are outdated and the recent AndroidX Framework actually made this very easy now, it's just a matter of finding the information
 - Right now the image stats are downloaded from the Flickr API and stored in the database but it blocks.  Future iteration should not block this to make the UI responsive
 - Lab3 has been helpful in understanding the database integration beyond concepts and was able to apply those knowledge here.
+- Note that the db entries _are_ real data but they are not wired to the UI yet.
+- The only thing working on the Options right now is the (Show as Grid)
+- The stats are using placeholder (aka fake) data
 
 ### Screenshots
 
@@ -228,6 +233,26 @@ Exit Application Due to Invalid API Keys
 Single Image Browsing
 
 ![](oneimage.png)
+
+New Grid (Iteration 3)
+
+![](newgrid.png)
+
+Linear Grid
+
+![](lineargrid.png)
+
+Options
+
+![](options.png)  
+
+Statistics
+
+![](stats.png)
+
+Database
+
+![](dbphoto.png)
 
 ## References
 

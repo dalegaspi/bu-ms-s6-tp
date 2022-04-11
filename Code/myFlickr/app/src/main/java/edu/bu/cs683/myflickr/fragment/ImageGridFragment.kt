@@ -1,6 +1,7 @@
 package edu.bu.cs683.myflickr.fragment
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.Configuration
 import android.os.AsyncTask
 import android.os.Bundle
@@ -38,6 +39,8 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     private var userId: String? = null
     lateinit var recyclerView: RecyclerView
 
+    var isGrid: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -51,12 +54,19 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentImageGridBinding.inflate(inflater, container, false)
-
-
-
+        loadPrefs()
         return binding.root
     }
 
+    fun redraw() {
+        val args = Bundle()
+        args.putString(ImageGridFragment.ARG_USER_ID, userId)
+
+        // also add the user id in the fragment
+        parentFragmentManager.commit {
+            replace<ImageGridFragment>(R.id.container, args = args)
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -67,6 +77,49 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
         userId?.let {
             loadImages()
         }
+
+        binding.showAsGrid.setOnClickListener {
+            isGrid = true
+            savePrefs()
+            redraw()
+        }
+
+        binding.showAsList.setOnClickListener {
+            isGrid = false
+            savePrefs()
+            redraw()
+        }
+    }
+
+    fun savePrefs() {
+        val sharedPreferences = activity?.getSharedPreferences(IMAGE_GRID_PREFS, Context.MODE_PRIVATE)
+
+        sharedPreferences?.let {
+            Log.i(TAG, "Saving $IMAGE_GRID_PREFS = $isGrid")
+            it.edit()
+                .putBoolean(IMAGE_IS_GRID, isGrid)
+                .apply()
+        }
+    }
+
+    fun loadPrefs() {
+        val sharedPreferences = activity?.getSharedPreferences(IMAGE_GRID_PREFS, Context.MODE_PRIVATE)
+        sharedPreferences?.let {
+            isGrid = it.getBoolean(IMAGE_IS_GRID, true)
+            Log.i(TAG, "Setting from $IMAGE_IS_GRID = $isGrid")
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        savePrefs()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+
     }
 
     /**
@@ -74,6 +127,9 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
      * of the phone screen
      */
     fun getGridColumnsPerRow(): Int {
+        if (!isGrid)
+            return 1
+
         return if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
             ROWS_PER_COLUMN_LANDSCAPE
         else
@@ -118,6 +174,8 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     }
 
     companion object {
+        const val IMAGE_GRID_PREFS = "ImageGridPrefs"
+        const val IMAGE_IS_GRID = "ImagesIsGrid"
         const val ARG_USER_ID = "user_id"
         const val GRID_PAGE_SIZE = 24
         const val ROWS_PER_COLUMN_PORTRAIT = 2

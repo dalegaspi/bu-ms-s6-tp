@@ -31,6 +31,8 @@ class AuthErrorFragment : Fragment() {
 
         binding.textErrorString.text = getString(R.string.flickr_api_auth_error)
 
+        // we finish the activity here because the app is rendered
+        // unuseable without the API key
         binding.exitApplicationButton.setOnClickListener {
             activity?.finish()
         }

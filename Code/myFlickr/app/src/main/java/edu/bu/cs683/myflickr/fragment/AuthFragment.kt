@@ -18,7 +18,6 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.replace
 import com.flickr4java.flickr.Flickr
 import com.flickr4java.flickr.REST
-import com.flickr4java.flickr.photos.SearchParameters
 import com.github.scribejava.apis.FlickrApi
 import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.OAuth1AccessToken
@@ -37,8 +36,8 @@ import edu.bu.cs683.myflickr.databinding.FragmentAuthBinding
  */
 class AuthFragment : Fragment() {
 
-    val APIKEY = BuildConfig.FLICKR_API_KEY
-    val APISECRET = BuildConfig.FLICKR_API_SECRET
+    val apiKey = BuildConfig.FLICKR_API_KEY
+    val apiSecret = BuildConfig.FLICKR_API_SECRET
 
     private var _binding: FragmentAuthBinding? = null
     private val binding get() = _binding!!
@@ -50,6 +49,7 @@ class AuthFragment : Fragment() {
     lateinit var flickr: Flickr
     lateinit var userId: String
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -60,12 +60,18 @@ class AuthFragment : Fragment() {
         _binding = FragmentAuthBinding.inflate(inflater, container, false)
 
         webview = binding.authWebView
+
+        // these next 2 are very important otherwise flickr website will not
+        // be able to load the OAuth pages and for the webview be able to intercept
+        // the OAuth tokens
         webview.settings.javaScriptEnabled = true
         webview.settings.domStorageEnabled = true
-        service = ServiceBuilder(APIKEY)
-            .apiSecret(APISECRET)
+        service = ServiceBuilder(apiKey)
+            .apiSecret(apiSecret)
             .build(FlickrApi.instance(FlickrApi.FlickrPerm.READ))
 
+        // launch the webview to authenticate the user and/or authorize the app
+        // to get the users information and images
         FlickrGetAuthUrlTask(requireActivity()).execute()
 
         return binding.root
@@ -85,10 +91,11 @@ class AuthFragment : Fragment() {
 
                 // let's set our API state holder
                 FlickrApiState.instance = FlickrApiState(user, flickr, accessToken)
-                val photosInterface = flickr.photosInterface
-                val searchParameters = SearchParameters()
-                searchParameters.userId = user.id
-                val photos = photosInterface.search(searchParameters, 5, 1)
+                // uncomment the following lines to test the API calls working
+                //val photosInterface = flickr.photosInterface
+                //val searchParameters = SearchParameters()
+                //searchParameters.userId = user.id
+                //val photos = photosInterface.search(searchParameters, 5, 1)
                 return accessToken
             }
 
@@ -102,13 +109,17 @@ class AuthFragment : Fragment() {
         }.execute().get()
     }
 
+    @SuppressLint("StaticFieldLeak")
     inner class FlickrGetAuthUrlTask(val activity: FragmentActivity) : AsyncTask<Void, Void, String>() {
 
         override fun doInBackground(vararg params: Void?): String? {
 
-            flickr = Flickr(APIKEY, APISECRET, REST())
+            flickr = Flickr(apiKey, apiSecret, REST())
             val authInterface = flickr.authInterface
 
+            // we are testing that the API works with the specified API Keys
+            // if it fails we set authURL to null and display the error by replacing
+            // the current fragment with AuthErrorFragment
             val authURL = kotlin.runCatching {
                 requestToken = authInterface.getRequestToken("https://www.flickr.com/auth-72157720836323165")
                 service.getAuthorizationUrl(requestToken)
@@ -125,14 +136,15 @@ class AuthFragment : Fragment() {
                         if (url != null) {
                             if (url.contains("oauth_verifier")) {
                                 // authorization complete hide web view
-                                webview.setVisibility(View.GONE)
+                                webview.visibility = View.GONE
 
                                 val uri = Uri.parse(url)
                                 verifier = uri.getQueryParameter("oauth_verifier")!!
 
-                                getAccessToken() // i extract the token here
+                                // we extract the token here
+                                getAccessToken()
 
-                                // launch to the Images Activity
+                                // launch to the Images Activity and leave the current activity
                                 val intent = Intent(activity, ImagesActivity::class.java)
                                 intent.putExtra("user_id", userId)
                                 startActivity(intent)
@@ -148,6 +160,7 @@ class AuthFragment : Fragment() {
             } ?: run {
                 Log.e(TAG, "API Authentication failed due to missing/invalid Flickr API key.")
 
+                // this displays the error for any API-related issues (invalid key, etc)
                 parentFragmentManager.commit {
                     replace<AuthErrorFragment>(R.id.container)
                 }

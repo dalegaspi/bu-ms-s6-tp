@@ -103,7 +103,8 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     }
 
     override fun getImageDetails(photo: Photo) {
-        // Load the fragment to
+        // Load the fragment to images activity
+        // this passes the flickr image id to the one image fragment
         Log.i(TAG, "Loading image ${photo.id}")
         val args = Bundle()
         args.putString(OneImageFragment.ARG_IMAGE_ID, photo.id)

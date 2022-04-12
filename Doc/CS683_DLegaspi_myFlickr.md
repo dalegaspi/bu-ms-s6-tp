@@ -154,7 +154,7 @@ A lot of the data will come via the Flickr API and will certainly leverage the a
 This is the initial directory structure of the project.  It only has the basic classes and artifacts that are generated using Android Studio IDE.  The Gradle script has been modified to add Third Party License references and Spotless plugin.
 
 
-![](dir3.png)
+![](dir4.png)
 
 
 ## Timeline
@@ -207,7 +207,7 @@ binding.exitApplicationButton.setOnClickListener {
 
 ### Iteration 3
 
-- Added more comments in the code per facilitator's feedback 😊
+- Added more comments in the code per facilitator's feedback 
 - Much research is done on the library to be used for the charts/statistics.  The data are mostly not wired yet but should provide some clues on what the final will look like
 - I learned that in Android there is the AppBar, ActionBar, and ToolBar and MaterialDesign has design guidance for all three.  It's confusing and seem convoluted.  Some significant work is done on the auto-hiding Toolbar.  Most of the information out there are outdated and the recent AndroidX Framework actually made this very easy now, it's just a matter of finding the information
 - Right now the image stats are downloaded from the Flickr API and stored in the database but it blocks.  Future iteration should not block this to make the UI responsive

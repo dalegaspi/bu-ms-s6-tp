@@ -1,10 +1,11 @@
-package edu.bu.cs683.myflickr.data
+package edu.bu.cs683.myflickr.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
-import edu.bu.cs683.myflickr.OneImageDetailListener
+import edu.bu.cs683.myflickr.data.Photo
+import edu.bu.cs683.myflickr.listener.OneImageDetailListener
 import edu.bu.cs683.myflickr.databinding.PhotoBinding
 
 class PhotosAdapter(val oneImageDetailListener: OneImageDetailListener, private val photos: MutableList<Photo> = mutableListOf()) : RecyclerView.Adapter<PhotosAdapter.PhotosViewHolder>() {
@@ -21,8 +22,12 @@ class PhotosAdapter(val oneImageDetailListener: OneImageDetailListener, private 
     override fun onBindViewHolder(holder: PhotosViewHolder, position: Int) {
         with(holder) {
             with(photos[position]) {
+                // Using Picasso we are pulling the image down and updating the ImagView
+                // in one go.
                 Picasso.get()
                     .load(url)
+                    .fit()
+                    .centerCrop()
                     .into(binding.imageView)
             }
 

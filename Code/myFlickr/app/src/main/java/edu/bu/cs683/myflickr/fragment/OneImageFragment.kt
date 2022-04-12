@@ -1,4 +1,4 @@
-package edu.bu.cs683.myflickr
+package edu.bu.cs683.myflickr.fragment
 
 import android.annotation.SuppressLint
 import android.os.AsyncTask
@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import com.flickr4java.flickr.Flickr
 import com.flickr4java.flickr.REST
 import com.squareup.picasso.Picasso
+import edu.bu.cs683.myflickr.BuildConfig
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.databinding.FragmentOneImageBinding
 
@@ -27,9 +28,11 @@ class OneImageFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // get the image and user ids from the fragment arguments
         arguments?.let {
-            userId = it.getString(OneImageFragment.ARG_USER_ID)
-            imageId = it.getString(OneImageFragment.ARG_IMAGE_ID)
+            userId = it.getString(ARG_USER_ID)
+            imageId = it.getString(ARG_IMAGE_ID)
         }
     }
 
@@ -48,6 +51,9 @@ class OneImageFragment : Fragment() {
 
     @SuppressLint("StaticFieldLeak")
     fun loadImage() {
+        // this is hopefully replaced with co-routine
+        // this goes to call the flickr API to get the photo
+        // with the specified ID then updated the ImageView on callback
         object : AsyncTask<Void, Void, Photo>() {
             override fun doInBackground(vararg p0: Void?): Photo {
                 val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())

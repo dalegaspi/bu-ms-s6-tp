@@ -1,16 +1,18 @@
-package edu.bu.cs683.myflickr
+package edu.bu.cs683.myflickr.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.databinding.FragmentAuthErrorBinding
 
 /**
- * A simple [Fragment] subclass.
- * Use the [AuthErrorFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * This fragment is used to display an error when there are issues with authentication
+ * with the Flickr API
+ *
+ * @author dlegaspi@bu.edu
  */
 class AuthErrorFragment : Fragment() {
     private var _binding: FragmentAuthErrorBinding? = null
@@ -27,8 +29,10 @@ class AuthErrorFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = FragmentAuthErrorBinding.inflate(inflater, container, false)
 
-        binding.textErrorString.text = "Unable to authenticate with Flickr due to API authentication errors (probably invalid API keys)."
+        binding.textErrorString.text = getString(R.string.flickr_api_auth_error)
 
+        // we finish the activity here because the app is rendered
+        // unuseable without the API key
         binding.exitApplicationButton.setOnClickListener {
             activity?.finish()
         }

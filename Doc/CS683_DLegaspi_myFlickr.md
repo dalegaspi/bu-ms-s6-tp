@@ -22,6 +22,7 @@ BU MET MSSD
   * [Iteration 0](#iteration-0)
   * [Iteration 1](#iteration-1)
   * [Iteration 2](#iteration-2)
+  * [Iteration 3](#iteration-3)
   * [Screenshots](#screenshots)
 - [References](#references)
 
@@ -106,6 +107,30 @@ It would be nice to have some push notifications for any likes or increased view
 |Test Results| TBD |
 |Status| Iteration 2: Fully implemented|
 
+ Title(Essential/Desirable/Optional)| Statistics (Essential) |
+|---|---|
+|Description|As a user, I should be able to see statistics of data around my images |
+|Mockups| |
+|Acceptance Tests| User showing some infographic when they tap on |
+|Test Results| TBD |
+|Status| Iteration 3: Partially implemented|
+
+| Title(Essential/Desirable/Optional)| Auto-Hiding Toolbar in Images Grid(Essential) |
+|---|---|
+|Description|Be able to change how the grid looks like and access statistics |
+|Mockups| ![](Image_Grid@0.5x.png)|
+|Acceptance Tests| A hiding tool bar with grid and stats option|
+|Test Results| TBD |
+|Status| Iteration 3: Fully implemented|
+
+| Title(Essential/Desirable/Optional)| View Images as Single Column (Essential) |
+|---|---|
+|Description|As a user, I should be able to have an option to view all my images in my account as a grid with 3 images per column |
+|Mockups| ![](Image_Grid@0.5x.png)|
+|Acceptance Tests| User can display all of his/her images in a grid with 3 images per column|
+|Test Results| TBD |
+|Status| Iteration 3: Fully implemented|
+
 ## Design and Implementation
 
 ### Basic Architecture
@@ -129,7 +154,7 @@ A lot of the data will come via the Flickr API and will certainly leverage the a
 This is the initial directory structure of the project.  It only has the basic classes and artifacts that are generated using Android Studio IDE.  The Gradle script has been modified to add Third Party License references and Spotless plugin.
 
 
-![](dir3.png)
+![](dir4.png)
 
 
 ## Timeline
@@ -138,9 +163,10 @@ This is the initial directory structure of the project.  It only has the basic c
 |---|---|---|
 |1|Authentication and Basic Image Browsing | Using Network connectivity and WebView for OAuth Handshake, using Flickr REST APIs|
 |2|Individual Image browsing (with Pinch to Zoom) and Graceful exit on API error|Fragments and RecyclerView|
-|3| | |
-|4| | |
-|5| | |
+|3|Toolbars, Storing of Data in Local database, Charts,
+Preferences | ViewModel, SharedPreferences, Database|
+|4|Infinite Scrolling, Image filtering Based on Tags | |
+|5|Save/Load of Image Filters| |
 
 
 ## Future Work (Optional)
@@ -179,6 +205,17 @@ binding.exitApplicationButton.setOnClickListener {
 - Layouts still a challenge although it's a bit manageable than before.
 
 
+### Iteration 3
+
+- Added more comments in the code per facilitator's feedback 
+- Much research is done on the library to be used for the charts/statistics.  The data are mostly not wired yet but should provide some clues on what the final will look like
+- I learned that in Android there is the AppBar, ActionBar, and ToolBar and MaterialDesign has design guidance for all three.  It's confusing and seem convoluted.  Some significant work is done on the auto-hiding Toolbar.  Most of the information out there are outdated and the recent AndroidX Framework actually made this very easy now, it's just a matter of finding the information
+- Right now the image stats are downloaded from the Flickr API and stored in the database but it blocks.  Future iteration should not block this to make the UI responsive
+- Lab3 has been helpful in understanding the database integration beyond concepts and was able to apply those knowledge here.
+- Note that the db entries _are_ real data but they are not wired to the UI yet.
+- The only thing working on the Options right now is the (Show as Grid)
+- The stats are using placeholder (aka fake) data
+
 ### Screenshots
 
 Login/Authorize App via Flickr OAuth
@@ -196,6 +233,26 @@ Exit Application Due to Invalid API Keys
 Single Image Browsing
 
 ![](oneimage.png)
+
+New Grid (Iteration 3)
+
+![](newgrid.png)
+
+Linear Grid
+
+![](lineargrid.png)
+
+Options
+
+![](options.png)  
+
+Statistics
+
+![](stats.png)
+
+Database
+
+![](dbphoto.png)
 
 ## References
 

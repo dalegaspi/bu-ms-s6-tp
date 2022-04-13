@@ -3,6 +3,7 @@ package edu.bu.cs683.myflickr.fragment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
+import android.opengl.Visibility
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
@@ -185,6 +186,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
                 val searchParameters = SearchParameters()
 
                 searchParameters.userId = userId
+                searchParameters.media = "photos"
                 val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, 1)
                     .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
                     .toMutableList()
@@ -212,7 +214,10 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
                     else -> GridLayoutManager(context, columnCount)
                 }
                 recyclerView.layoutManager = layoutManager
-                recyclerView.adapter = PhotosAdapter(this@ImageGridFragment, listViewModel.currentImagesList.value!!.toMutableList())
+                recyclerView.adapter = PhotosAdapter(this@ImageGridFragment,
+                    listViewModel.currentImagesList.value!!.toMutableList())
+
+                binding.progress.visibility = View.GONE
             }
         }.execute()
     }

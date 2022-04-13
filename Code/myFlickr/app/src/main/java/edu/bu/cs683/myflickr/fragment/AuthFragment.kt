@@ -147,6 +147,9 @@ class AuthFragment : Fragment() {
                                 // launch to the Images Activity and leave the current activity
                                 val intent = Intent(activity, ImagesActivity::class.java)
                                 intent.putExtra("user_id", userId)
+
+                                // remove from back stack
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                                 startActivity(intent)
                                 return true
                             }

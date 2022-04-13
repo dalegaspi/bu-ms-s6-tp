@@ -3,7 +3,6 @@ package edu.bu.cs683.myflickr.fragment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
-import android.opengl.Visibility
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
@@ -23,12 +22,12 @@ import com.flickr4java.flickr.REST
 import com.flickr4java.flickr.photos.SearchParameters
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import edu.bu.cs683.myflickr.BuildConfig
-import edu.bu.cs683.myflickr.listener.OneImageDetailListener
 import edu.bu.cs683.myflickr.R
-import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.adapter.PhotosAdapter
+import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.data.PhotoRepository
 import edu.bu.cs683.myflickr.databinding.FragmentImageGridBinding
+import edu.bu.cs683.myflickr.listener.OneImageDetailListener
 import edu.bu.cs683.myflickr.viewmodel.ImagesViewModel
 
 /**
@@ -107,7 +106,6 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
         }
     }
 
-
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     fun showAppOptions() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
@@ -159,8 +157,6 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
 
     override fun onResume() {
         super.onResume()
-
-
     }
 
     /**
@@ -214,8 +210,10 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
                     else -> GridLayoutManager(context, columnCount)
                 }
                 recyclerView.layoutManager = layoutManager
-                recyclerView.adapter = PhotosAdapter(this@ImageGridFragment,
-                    listViewModel.currentImagesList.value!!.toMutableList())
+                recyclerView.adapter = PhotosAdapter(
+                    this@ImageGridFragment,
+                    listViewModel.currentImagesList.value!!.toMutableList()
+                )
 
                 binding.progress.visibility = View.GONE
             }

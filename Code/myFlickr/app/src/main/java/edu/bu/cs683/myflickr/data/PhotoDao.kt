@@ -20,4 +20,3 @@ interface PhotoDao {
     @Query("SELECT * FROM photos")
     fun getAllProjects(): LiveData<List<Photo>>
 }
-

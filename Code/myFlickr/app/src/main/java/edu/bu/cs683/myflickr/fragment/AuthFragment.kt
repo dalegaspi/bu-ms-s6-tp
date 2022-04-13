@@ -92,10 +92,10 @@ class AuthFragment : Fragment() {
                 // let's set our API state holder
                 FlickrApiState.instance = FlickrApiState(user, flickr, accessToken)
                 // uncomment the following lines to test the API calls working
-                //val photosInterface = flickr.photosInterface
-                //val searchParameters = SearchParameters()
-                //searchParameters.userId = user.id
-                //val photos = photosInterface.search(searchParameters, 5, 1)
+                // val photosInterface = flickr.photosInterface
+                // val searchParameters = SearchParameters()
+                // searchParameters.userId = user.id
+                // val photos = photosInterface.search(searchParameters, 5, 1)
                 return accessToken
             }
 

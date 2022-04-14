@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Switch
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
@@ -79,6 +80,14 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
 
         userId?.let {
             loadImages()
+        }
+
+        binding.swipeContainer.setOnRefreshListener {
+            binding.progress.visibility = View.VISIBLE
+            loadImages()
+            Toast.makeText(activity, "Image catalog retrieval complete.", Toast.LENGTH_SHORT).show()
+            binding.swipeContainer.isRefreshing = false
+            binding.progress.visibility = View.GONE
         }
 
         binding.showAsGrid.setOnClickListener {

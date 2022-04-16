@@ -87,7 +87,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             loadImages()
             Toast.makeText(activity, "Image catalog retrieval complete.", Toast.LENGTH_SHORT).show()
             binding.swipeContainer.isRefreshing = false
-            binding.progress.visibility = View.GONE
+
         }
 
         binding.showAsGrid.setOnClickListener {
@@ -166,6 +166,8 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
 
     override fun onResume() {
         super.onResume()
+
+        loadPrefs()
     }
 
     /**

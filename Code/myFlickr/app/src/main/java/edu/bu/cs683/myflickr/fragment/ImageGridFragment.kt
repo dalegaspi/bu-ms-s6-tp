@@ -13,6 +13,7 @@ import android.webkit.CookieManager
 import android.widget.Button
 import android.widget.Switch
 import android.widget.Toast
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
@@ -27,6 +28,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import edu.bu.cs683.myflickr.BuildConfig
 import edu.bu.cs683.myflickr.MainActivity
 import edu.bu.cs683.myflickr.R
+import edu.bu.cs683.myflickr.adapter.EndlessRecyclerViewScrollListener
 import edu.bu.cs683.myflickr.adapter.PhotosAdapter
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.data.PhotoRepository
@@ -51,6 +53,8 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     lateinit var recyclerView: RecyclerView
 
     var isGrid: Boolean = true
+
+    var currentGridPage = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,6 +93,22 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             loadImages()
         }
 
+        recyclerView = binding.photosRecyclerView
+        val columnCount = getGridColumnsPerRow()
+        val layoutManager = when {
+            columnCount <= 1 -> LinearLayoutManager(context)
+            else -> GridLayoutManager(context, columnCount)
+        }
+        recyclerView.layoutManager = layoutManager
+
+        binding.photosRecyclerView.addOnScrollListener(object : EndlessRecyclerViewScrollListener(layoutManager) {
+            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
+                Toast.makeText(activity, "Loading page $page with $totalItemsCount.", Toast.LENGTH_SHORT).show()
+                currentGridPage += 1
+                loadImages()
+            }
+
+        })
         binding.swipeContainer.setOnRefreshListener {
             binding.progress.visibility = View.VISIBLE
             loadImages()
@@ -223,7 +243,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
 
             searchParameters.userId = userId
             searchParameters.media = "photos"
-            val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, 1)
+            val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, currentGridPage)
                 .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
                 .toMutableList()
 
@@ -240,18 +260,14 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             val listViewModel =
                 ViewModelProvider(this@ImageGridFragment).get(ImagesViewModel::class.java)
 
-            listViewModel.setImagesList(photos)
+            val currentlist = listViewModel.currentImagesList.value
+
+            listViewModel.setImagesList(currentlist?.plus(photos) ?: photos)
 
             // build the recycler view and bind the adapter to it so we
             // can draw the individual images from the photo metadata
             // returned by the API
             recyclerView = binding.photosRecyclerView
-            val columnCount = getGridColumnsPerRow()
-            val layoutManager = when {
-                columnCount <= 1 -> LinearLayoutManager(context)
-                else -> GridLayoutManager(context, columnCount)
-            }
-            recyclerView.layoutManager = layoutManager
             recyclerView.adapter = PhotosAdapter(
                 this@ImageGridFragment,
                 listViewModel.currentImagesList.value!!.toMutableList()

@@ -258,7 +258,9 @@ private fun loadImages() {
 Additionally, pull down to refresh is also implemented with the aid of `SwipeRefreshLayout` which makes it somewhat trivial to implement the swipe down to refresh gesture.
 - I wasn't particularly happy with individual image navigation where you need to go back then click on another image on the grid to see the next image.  I wanted swipe left/right.  I could have taken the "easy way" and implement a Gesture listener, but there's no fun in that...so instead I refactored the single-image fragment to use [ViewPager2](https://developer.android.com/training/animation/screen-slide-2)
 - There is also now an option to log out of the app under Options.  This is really just deleting the cookies and just redirects the user to the Authentication activity.
-- Last but not the least we have an app logo and a proper splash screen :-) The latest version of the Android SDK has made this essentially requiring no code at all to create [splash screens](https://developer.android.com/guide/topics/ui/splash-screen)
+- For the pagination, I wanted to use the Paging library and was planning to use it.  However when I realized the extent of refactoring that I needed to do do, I opted for an alternate solution instead which is found [here](https://github.com/codepath/android_guides/wiki/Endless-Scrolling-with-AdapterViews-and-RecyclerView).  Ultimately, I just wanted to have a scroll listener that when it gets to the end it will load more data into the adapter, and this is what the alternate solution does and in the interest of time, this seems the pragmatic approach.  I will revisit this on the final iteration if I have some time left.
+- The statistics are still not wired to the data.  This will be done in the final iteration.
+- Last but not the least we have an app logo and a proper splash screen :-) The latest version of the Android SDK has made this essentially requiring no code at all to create [splash screens](https://developer.android.com/guide/topics/ui/splash-screen).
 
 ### Screenshots
 

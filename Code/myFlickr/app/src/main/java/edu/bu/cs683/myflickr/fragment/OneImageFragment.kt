@@ -4,10 +4,8 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.flickr4java.flickr.Flickr
 import com.flickr4java.flickr.REST
@@ -18,7 +16,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 /**
  * Fragment for one image
@@ -55,7 +52,6 @@ class OneImageFragment : Fragment() {
         return binding.root
     }
 
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -78,6 +74,7 @@ class OneImageFragment : Fragment() {
 
             photosInterface.getPhoto(imageId)
             val flickrPhoto = photosInterface.getPhoto(imageId)
+
             val photo = Photo(id = flickrPhoto.id, url = flickrPhoto.mediumUrl, title = flickrPhoto.title)
             return@async photo
         }

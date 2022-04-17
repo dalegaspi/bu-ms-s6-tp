@@ -323,9 +323,9 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
         // this passes the flickr image id to the one image fragment
         Log.i(TAG, "Loading image ${photo.id}")
         val args = Bundle()
-        args.putString(OneImageFragment.ARG_IMAGE_ID, photo.id)
+        args.putString(OneImageFragmentPager.ARG_IMAGE_ID, photo.id)
         parentFragmentManager.commit {
-            replace<OneImageFragment>(R.id.container, args = args)
+            replace<OneImageFragmentPager>(R.id.container, args = args)
             addToBackStack(null)
         }
     }

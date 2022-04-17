@@ -259,52 +259,6 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
 
             binding.progress.visibility = View.GONE
         }
-        /*
-        object : AsyncTask<Void, Void, MutableList<Photo>>() {
-            override fun doInBackground(vararg p0: Void?): MutableList<Photo> {
-                val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
-                val photosInterface = flickr.photosInterface
-                val searchParameters = SearchParameters()
-
-                searchParameters.userId = userId
-                searchParameters.media = "photos"
-                val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, 1)
-                    .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
-                    .toMutableList()
-
-                photos.forEach {
-                    PhotoRepository.get().add(it)
-                }
-
-                return photos
-            }
-
-            override fun onPostExecute(photos: MutableList<Photo>) {
-                val listViewModel =
-                    ViewModelProvider(this@ImageGridFragment).get(ImagesViewModel::class.java)
-
-                listViewModel.setImagesList(photos)
-
-                // build the recycler view and bind the adapter to it so we
-                // can draw the individual images from the photo metadata
-                // returned by the API
-                recyclerView = binding.photosRecyclerView
-                val columnCount = getGridColumnsPerRow()
-                val layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                recyclerView.layoutManager = layoutManager
-                recyclerView.adapter = PhotosAdapter(
-                    this@ImageGridFragment,
-                    listViewModel.currentImagesList.value!!.toMutableList()
-                )
-
-                binding.progress.visibility = View.GONE
-            }
-        }.execute()
-
-         */
     }
 
     companion object {

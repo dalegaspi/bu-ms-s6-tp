@@ -1,18 +1,24 @@
 package edu.bu.cs683.myflickr.fragment
 
 import android.annotation.SuppressLint
-import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.flickr4java.flickr.Flickr
 import com.flickr4java.flickr.REST
-import com.squareup.picasso.Picasso
 import edu.bu.cs683.myflickr.BuildConfig
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.databinding.FragmentOneImageBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 /**
  * Fragment for one image
@@ -49,11 +55,45 @@ class OneImageFragment : Fragment() {
         return binding.root
     }
 
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // go to previous activity/fragment
+        binding.oneImageView.setOnSingleFlingListener { _, _, _, _ ->
+            Log.d(TAG, "fling detected")
+            parentFragmentManager.popBackStack()
+            true
+        }
+    }
+
     @SuppressLint("StaticFieldLeak")
     fun loadImage() {
-        // this is hopefully replaced with co-routine
         // this goes to call the flickr API to get the photo
         // with the specified ID then updated the ImageView on callback
+        val getImageJob = CoroutineScope(Dispatchers.IO).async {
+            val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
+            val photosInterface = flickr.photosInterface
+
+            photosInterface.getPhoto(imageId)
+            val flickrPhoto = photosInterface.getPhoto(imageId)
+            val photo = Photo(id = flickrPhoto.id, url = flickrPhoto.mediumUrl, title = flickrPhoto.title)
+            return@async photo
+        }
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val photo = getImageJob.await()
+            with(photo) {
+                com.squareup.picasso.Picasso.get()
+                    .load(url)
+                    .into(binding.oneImageView)
+
+                binding.oneImageDescText.text = title
+            }
+        }
+        // this is hopefully replaced with co-routine
+       /*
         object : AsyncTask<Void, Void, Photo>() {
             override fun doInBackground(vararg p0: Void?): Photo {
                 val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
@@ -74,7 +114,7 @@ class OneImageFragment : Fragment() {
                     binding.oneImageDescText.text = title
                 }
             }
-        }.execute()
+        }.execute()*/
     }
 
     companion object {

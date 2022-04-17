@@ -23,6 +23,7 @@
         android:id="@+id/showAsGrid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:text="Show Images As Grid" />
 
     <Space
@@ -33,6 +34,17 @@
         android:id="@+id/showMetadata"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:text="Show Image Metadata" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="16sp" />
+
+    <Button
+        android:id="@+id/logOutButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Log Out" />
 
 </LinearLayout>

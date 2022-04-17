@@ -2,13 +2,15 @@ package edu.bu.cs683.myflickr.fragment
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
-import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.CookieManager
+import android.widget.Button
 import android.widget.Switch
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -23,6 +25,7 @@ import com.flickr4java.flickr.REST
 import com.flickr4java.flickr.photos.SearchParameters
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import edu.bu.cs683.myflickr.BuildConfig
+import edu.bu.cs683.myflickr.MainActivity
 import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.adapter.PhotosAdapter
 import edu.bu.cs683.myflickr.data.Photo
@@ -30,6 +33,10 @@ import edu.bu.cs683.myflickr.data.PhotoRepository
 import edu.bu.cs683.myflickr.databinding.FragmentImageGridBinding
 import edu.bu.cs683.myflickr.listener.OneImageDetailListener
 import edu.bu.cs683.myflickr.viewmodel.ImagesViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 /**
  * Fragment for Image grid
@@ -87,7 +94,6 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             loadImages()
             Toast.makeText(activity, "Image catalog retrieval complete.", Toast.LENGTH_SHORT).show()
             binding.swipeContainer.isRefreshing = false
-
         }
 
         binding.showAsGrid.setOnClickListener {
@@ -117,6 +123,9 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
 
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     fun showAppOptions() {
+        // unlike the typical UI hydration where we use fragments and view bindings
+        // we're keeping the options dialog to do it the manual way to keep
+        // it simple so we are back to using findViewById here
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         bottomSheetDialog.setContentView(R.layout.options_layout)
 
@@ -136,10 +145,31 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             bottomSheetDialog.dismiss()
         }
 
+        val logoutButton = bottomSheetDialog.findViewById<Button>(R.id.logOutButton)
+        logoutButton?.setOnClickListener {
+
+            // clear the cookies and it will log out the user
+            CookieManager.getInstance().removeAllCookies(null)
+            CookieManager.getInstance().flush()
+
+            Toast.makeText(
+                activity,
+                "User logged out.",
+                Toast.LENGTH_LONG
+            ).show()
+
+            bottomSheetDialog.dismiss()
+
+            // return to auth without backstack
+            val intent = Intent(activity, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
+        }
+
         bottomSheetDialog.show()
     }
 
-    fun savePrefs() {
+    private fun savePrefs() {
         val sharedPreferences = activity?.getSharedPreferences(IMAGE_GRID_PREFS, Context.MODE_PRIVATE)
 
         sharedPreferences?.let {
@@ -150,7 +180,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
         }
     }
 
-    fun loadPrefs() {
+    private fun loadPrefs() {
         val sharedPreferences = activity?.getSharedPreferences(IMAGE_GRID_PREFS, Context.MODE_PRIVATE)
         sharedPreferences?.let {
             isGrid = it.getBoolean(IMAGE_IS_GRID, true)
@@ -174,7 +204,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
      * Gets the image grid column per row depending on orientation
      * of the phone screen
      */
-    fun getGridColumnsPerRow(): Int {
+    private fun getGridColumnsPerRow(): Int {
         if (!isGrid)
             return 1
 
@@ -184,8 +214,52 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             ROWS_PER_COLUMN_PORTRAIT
     }
 
-    @SuppressLint("StaticFieldLeak")
-    fun loadImages() {
+    private fun loadImages() {
+
+        val getImagesJob = CoroutineScope(Dispatchers.IO).async {
+            val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
+            val photosInterface = flickr.photosInterface
+            val searchParameters = SearchParameters()
+
+            searchParameters.userId = userId
+            searchParameters.media = "photos"
+            val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, 1)
+                .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
+                .toMutableList()
+
+            photos.forEach {
+                PhotoRepository.get().add(it)
+            }
+
+            return@async photos
+        }
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val photos = getImagesJob.await()
+
+            val listViewModel =
+                ViewModelProvider(this@ImageGridFragment).get(ImagesViewModel::class.java)
+
+            listViewModel.setImagesList(photos)
+
+            // build the recycler view and bind the adapter to it so we
+            // can draw the individual images from the photo metadata
+            // returned by the API
+            recyclerView = binding.photosRecyclerView
+            val columnCount = getGridColumnsPerRow()
+            val layoutManager = when {
+                columnCount <= 1 -> LinearLayoutManager(context)
+                else -> GridLayoutManager(context, columnCount)
+            }
+            recyclerView.layoutManager = layoutManager
+            recyclerView.adapter = PhotosAdapter(
+                this@ImageGridFragment,
+                listViewModel.currentImagesList.value!!.toMutableList()
+            )
+
+            binding.progress.visibility = View.GONE
+        }
+        /*
         object : AsyncTask<Void, Void, MutableList<Photo>>() {
             override fun doInBackground(vararg p0: Void?): MutableList<Photo> {
                 val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
@@ -229,6 +303,8 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
                 binding.progress.visibility = View.GONE
             }
         }.execute()
+
+         */
     }
 
     companion object {

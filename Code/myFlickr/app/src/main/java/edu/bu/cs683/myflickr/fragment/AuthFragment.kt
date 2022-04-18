@@ -113,36 +113,6 @@ class AuthFragment : Fragment() {
             "Token = " + accessToken.token + "Secret = " + accessToken.tokenSecret,
             Toast.LENGTH_LONG
         ).show()
-
-        /*
-        object : AsyncTask<Void, Void, OAuth1AccessToken>() {
-            override fun doInBackground(vararg p0: Void?): OAuth1AccessToken? {
-                val accessToken =
-                    service.getAccessToken(requestToken, verifier)
-
-                val authInterface = flickr.authInterface.checkToken(accessToken)
-                val user = authInterface.user
-                userId = user.id
-                Log.d(MainActivity.TAG, "user = ${user.realName}")
-
-                // let's set our API state holder
-                FlickrApiState.instance = FlickrApiState(user, flickr, accessToken)
-                // uncomment the following lines to test the API calls working
-                // val photosInterface = flickr.photosInterface
-                // val searchParameters = SearchParameters()
-                // searchParameters.userId = user.id
-                // val photos = photosInterface.search(searchParameters, 5, 1)
-                return accessToken
-            }
-
-            override fun onPostExecute(result: OAuth1AccessToken) {
-                Toast.makeText(
-                    activity,
-                    "Token = " + result.token + "Secret = " + result.tokenSecret,
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }.execute().get()*/
     }
 
     fun flickrAuthenticate() {

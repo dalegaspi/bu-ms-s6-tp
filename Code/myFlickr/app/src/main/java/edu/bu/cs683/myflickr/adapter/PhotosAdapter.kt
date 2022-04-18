@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import edu.bu.cs683.myflickr.data.Photo
-import edu.bu.cs683.myflickr.listener.OneImageDetailListener
 import edu.bu.cs683.myflickr.databinding.PhotoBinding
+import edu.bu.cs683.myflickr.listener.OneImageDetailListener
 
 class PhotosAdapter(val oneImageDetailListener: OneImageDetailListener, private val photos: MutableList<Photo> = mutableListOf()) : RecyclerView.Adapter<PhotosAdapter.PhotosViewHolder>() {
     val IMAGE_SIDE_PX = 400

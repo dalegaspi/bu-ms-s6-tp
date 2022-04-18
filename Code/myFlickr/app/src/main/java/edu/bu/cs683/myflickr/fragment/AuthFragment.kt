@@ -3,7 +3,6 @@ package edu.bu.cs683.myflickr.fragment
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,7 +12,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
 import com.flickr4java.flickr.Flickr
@@ -29,6 +27,8 @@ import edu.bu.cs683.myflickr.MainActivity
 import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.data.FlickrApiState
 import edu.bu.cs683.myflickr.databinding.FragmentAuthBinding
+import kotlinx.coroutines.*
+
 /**
  * Authentication fragment to deal with Flickr Auth
  *
@@ -48,6 +48,8 @@ class AuthFragment : Fragment() {
     lateinit var requestToken: OAuth1RequestToken
     lateinit var flickr: Flickr
     lateinit var userId: String
+
+    lateinit var accessToken: OAuth1AccessToken
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
@@ -72,16 +74,22 @@ class AuthFragment : Fragment() {
 
         // launch the webview to authenticate the user and/or authorize the app
         // to get the users information and images
-        FlickrGetAuthUrlTask(requireActivity()).execute()
+        flickrAuthenticate()
 
         return binding.root
     }
 
     @SuppressLint("StaticFieldLeak")
     fun getAccessToken() {
-        object : AsyncTask<Void, Void, OAuth1AccessToken>() {
-            override fun doInBackground(vararg p0: Void?): OAuth1AccessToken? {
-                val accessToken =
+
+        // this is actually bad practice because the main thread is blocked
+        // while token is retrieved; we are tolerating this here for now since
+        // this token retrieval process is quick but the proper way is that
+        // we should really have the UI display a progress bar while this is
+        // happening and continue to start the next activity
+        runBlocking {
+            val token = CoroutineScope(Dispatchers.IO).async {
+                accessToken =
                     service.getAccessToken(requestToken, verifier)
 
                 val authInterface = flickr.authInterface.checkToken(accessToken)
@@ -92,27 +100,23 @@ class AuthFragment : Fragment() {
                 // let's set our API state holder
                 FlickrApiState.instance = FlickrApiState(user, flickr, accessToken)
                 // uncomment the following lines to test the API calls working
-                //val photosInterface = flickr.photosInterface
-                //val searchParameters = SearchParameters()
-                //searchParameters.userId = user.id
-                //val photos = photosInterface.search(searchParameters, 5, 1)
-                return accessToken
-            }
+                // val photosInterface = flickr.photosInterface
+                // val searchParameters = SearchParameters()
+                // searchParameters.userId = user.id
+                // val photos = photosInterface.search(searchParameters, 5, 1)
+                return@async accessToken
+            }.join()
+        }
 
-            override fun onPostExecute(result: OAuth1AccessToken) {
-                Toast.makeText(
-                    activity,
-                    "Token = " + result.token + "Secret = " + result.tokenSecret,
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }.execute().get()
+        Toast.makeText(
+            activity,
+            "Token = " + accessToken.token + "Secret = " + accessToken.tokenSecret,
+            Toast.LENGTH_LONG
+        ).show()
     }
 
-    @SuppressLint("StaticFieldLeak")
-    inner class FlickrGetAuthUrlTask(val activity: FragmentActivity) : AsyncTask<Void, Void, String>() {
-
-        override fun doInBackground(vararg params: Void?): String? {
+    fun flickrAuthenticate() {
+        val getAuthUrlJob = CoroutineScope(Dispatchers.IO).async {
 
             flickr = Flickr(apiKey, apiSecret, REST())
             val authInterface = flickr.authInterface
@@ -125,10 +129,11 @@ class AuthFragment : Fragment() {
                 service.getAuthorizationUrl(requestToken)
             }
 
-            return authURL.getOrNull()
+            return@async authURL.getOrNull()
         }
 
-        override fun onPostExecute(authURL: String?) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val authURL = getAuthUrlJob.await()
             authURL?.let {
                 webview.webViewClient = object : WebViewClient() {
                     override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
@@ -147,6 +152,9 @@ class AuthFragment : Fragment() {
                                 // launch to the Images Activity and leave the current activity
                                 val intent = Intent(activity, ImagesActivity::class.java)
                                 intent.putExtra("user_id", userId)
+
+                                // remove from back stack
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                                 startActivity(intent)
                                 return true
                             }

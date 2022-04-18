@@ -2,17 +2,14 @@ package edu.bu.cs683.myflickr.fragment
 
 import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.github.mikephil.charting.animation.Easing
+import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
-import edu.bu.cs683.myflickr.R
-import edu.bu.cs683.myflickr.databinding.FragmentImageGridBinding
 import edu.bu.cs683.myflickr.databinding.FragmentStatsBinding
 
 /**
@@ -26,11 +23,11 @@ class StatsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     fun getDataSet(): List<BarEntry> {
-        val data = listOf(BarEntry(1f, 30f),
+        val data = listOf(
+            BarEntry(1f, 30f),
             BarEntry(2f, 15f),
             BarEntry(3f, 20f),
             BarEntry(4f, 15f),
@@ -49,22 +46,21 @@ class StatsFragment : Fragment() {
         val barChart = binding.barChart
         val barDataSet = BarDataSet(getDataSet(), "Views")
 
-
         barChart.data = BarData(barDataSet)
-        //hide grid lines
+        // hide grid lines
         barChart.axisLeft.setDrawGridLines(false)
         barChart.xAxis.setDrawGridLines(false)
         barChart.xAxis.setDrawAxisLine(false)
 
-        //remove right y-axis
+        // remove right y-axis
         barChart.axisRight.isEnabled = false
 
         barChart.description.isEnabled = false
         barDataSet.setColors(*ColorTemplate.MATERIAL_COLORS)
-        //add animation
+        // add animation
         barChart.animateY(500)
 
-        //draw bar chart
+        // draw bar chart
         barChart.invalidate()
     }
 
@@ -73,11 +69,11 @@ class StatsFragment : Fragment() {
 
         pieChart.setUsePercentValues(true)
         pieChart.description.text = ""
-        //hollow pie chart
+        // hollow pie chart
         pieChart.isDrawHoleEnabled = false
         pieChart.setTouchEnabled(false)
         pieChart.setDrawEntryLabels(false)
-        //adding padding
+        // adding padding
         pieChart.setExtraOffsets(20f, 0f, 20f, 20f)
         pieChart.setUsePercentValues(true)
         pieChart.isRotationEnabled = false
@@ -101,41 +97,36 @@ class StatsFragment : Fragment() {
         pieChart.data = data
         data.setValueTextSize(15f)
         pieChart.setExtraOffsets(5f, 10f, 5f, 5f)
-        //pieChart.animateY(1400, Easing.)
+        // pieChart.animateY(1400, Easing.)
 
-        //create hole in center
+        // create hole in center
         pieChart.holeRadius = 58f
         pieChart.transparentCircleRadius = 61f
         pieChart.isDrawHoleEnabled = true
         pieChart.setHoleColor(Color.WHITE)
 
-
-        //add text in center
-        pieChart.setDrawCenterText(true);
+        // add text in center
+        pieChart.setDrawCenterText(true)
         pieChart.centerText = "Camera Brand Breakdown"
 
         pieChart.invalidate()
     }
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-       // return inflater.inflate(R.layout.fragment_stats, container, false)
-
+        // return inflater.inflate(R.layout.fragment_stats, container, false)
 
         _binding = FragmentStatsBinding.inflate(inflater, container, false)
 
-
         drawBarChart()
         drawPieChart()
-
-
 
         return binding.root
     }
 
     companion object {
-
     }
 }

@@ -28,6 +28,8 @@
             android:background="#222222"
             app:layout_scrollFlags="scroll|enterAlways">
 
+
+
             <ImageView
                 android:id="@+id/showAsGrid"
                 android:layout_width="wrap_content"
@@ -65,13 +67,28 @@
                 android:src="@drawable/cog_outline"
                 tools:src="@drawable/cog_outline" />
 
+
         </androidx.appcompat.widget.Toolbar>
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_marginTop="-7dp"
+            android:layout_marginBottom="-7dp"
+            android:indeterminate="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal" />
     </com.google.android.material.appbar.AppBarLayout>
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/photosRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

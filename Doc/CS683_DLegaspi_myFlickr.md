@@ -23,9 +23,9 @@ BU MET MSSD
   * [Iteration 1](#iteration-1)
   * [Iteration 2](#iteration-2)
   * [Iteration 3](#iteration-3)
+  * [Iteration 4](#iteration-4)
   * [Screenshots](#screenshots)
 - [References](#references)
-
 
 ## Overview
 
@@ -165,8 +165,8 @@ This is the initial directory structure of the project.  It only has the basic c
 |2|Individual Image browsing (with Pinch to Zoom) and Graceful exit on API error|Fragments and RecyclerView|
 |3|Toolbars, Storing of Data in Local database, Charts,
 Preferences | ViewModel, SharedPreferences, Database|
-|4|Infinite Scrolling, Image filtering Based on Tags | |
-|5|Save/Load of Image Filters| |
+|4|Splash Screen, ProgressBar, Infinite Scrolling, Swipe Left/Right on Individual Image, Logout| Coroutines, ProgressBar, ViewPager|
+|5|Statistics| |
 
 
 ## Future Work (Optional)
@@ -215,6 +215,52 @@ binding.exitApplicationButton.setOnClickListener {
 - Note that the db entries _are_ real data but they are not wired to the UI yet.
 - The only thing working on the Options right now is the (Show as Grid)
 - The stats are using placeholder (aka fake) data
+
+### Iteration 4 
+ 
+- Much work and time is spent wrapping my head around Coroutines but upon understanding it I was able to migrate the asynchronous calls from the deprecated `AsyncTask<T>` to using coroutines and the code came out to be more compact and easier to understand.
+- Progress bar has been added when loading the image grid.  It is very subtle because it's almost always quick, but there is actually a progress bar widget underneath the toolbar when the image grid is loading and it goes away when the images metadata are pulled from Flickr API is done (i.e., it is not fake and is done asynchronously with coroutines!).  
+
+```kotlin
+private fun loadImages() {
+    val getImagesJob = CoroutineScope(Dispatchers.IO).async {
+        // code to get the photos from Flickr API
+
+        photos.forEach {
+            PhotoRepository.get().add(it)
+        }
+
+        return@async photos
+    }
+
+    CoroutineScope(Dispatchers.Main).launch {
+        val photos = getImagesJob.await()
+
+        val listViewModel =
+            ViewModelProvider(this@ImageGridFragment).get(ImagesViewModel::class.java)
+
+        listViewModel.setImagesList(photos)
+
+        // setting the grid code
+    
+        recyclerView.layoutManager = layoutManager
+        recyclerView.adapter = PhotosAdapter(
+            this@ImageGridFragment,
+            listViewModel.currentImagesList.value!!.toMutableList()
+        )
+
+        binding.progress.visibility = View.GONE
+    }
+}
+
+```
+
+Additionally, pull down to refresh is also implemented with the aid of `SwipeRefreshLayout` which makes it somewhat trivial to implement the pull down to refresh gesture.
+- I wasn't particularly happy with individual image navigation where you need to go back then click on another image on the grid to see the next image.  I wanted swipe left/right.  I could have taken the "easy way" and implement a Gesture listener, but there's no fun in that...so instead I refactored the single-image fragment to use [ViewPager2](https://developer.android.com/training/animation/screen-slide-2)
+- There is also now an option to log out of the app under Options.  This is really just deleting the cookies and just redirects the user to the Authentication activity.
+- For the pagination, I wanted to use the Paging library and was planning to use it.  However when I realized the extent of refactoring that I needed to do do, I opted for an alternate solution instead which is found [here](https://github.com/codepath/android_guides/wiki/Endless-Scrolling-with-AdapterViews-and-RecyclerView).  Ultimately, I just wanted to have a scroll listener that when it gets to the end it will load more data into the adapter, and this is what the alternate solution does and in the interest of time, this seems the pragmatic approach.  I will revisit this on the final iteration if I have some time left.
+- The statistics are still not wired to the data.  This will be done in the final iteration.
+- Last but not the least we have an app logo and a proper splash screen :-) The latest version of the Android SDK has made this essentially requiring no code at all to create [splash screens](https://developer.android.com/guide/topics/ui/splash-screen).
 
 ### Screenshots
 

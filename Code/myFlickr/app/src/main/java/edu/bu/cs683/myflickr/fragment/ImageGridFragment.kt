@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -89,7 +90,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             ViewModelProvider(this).get(ImagesViewModel::class.java)
 
         userId?.let {
-            loadImages()
+            loadImages(1)
         }
 
         recyclerView = binding.photosRecyclerView
@@ -99,17 +100,25 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             else -> GridLayoutManager(context, columnCount)
         }
         recyclerView.layoutManager = layoutManager
+        recyclerView = binding.photosRecyclerView
+        recyclerView.adapter = PhotosAdapter(
+            this@ImageGridFragment,
+            ArrayList()
+        )
 
         binding.photosRecyclerView.addOnScrollListener(object : EndlessRecyclerViewScrollListener(layoutManager) {
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
-                Toast.makeText(activity, "Loading page $page with $totalItemsCount.", Toast.LENGTH_SHORT).show()
-                currentGridPage += 1
-                loadImages()
+                //Toast.makeText(activity, "Loading page $page with $totalItemsCount.", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "Loading page $page with $totalItemsCount")
+                if (page > 1)
+                    binding.progressMore.visibility = View.VISIBLE
+                loadImages(page + 1)
             }
         })
         binding.swipeContainer.setOnRefreshListener {
-            binding.progress.visibility = View.VISIBLE
-            loadImages()
+            //binding.progress.visibility = View.VISIBLE
+            binding.progressMore.visibility = View.VISIBLE
+            loadImages(1)
             Toast.makeText(activity, "Image catalog retrieval complete.", Toast.LENGTH_SHORT).show()
             binding.swipeContainer.isRefreshing = false
         }
@@ -232,7 +241,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             ROWS_PER_COLUMN_PORTRAIT
     }
 
-    private fun loadImages() {
+    private fun loadImages(page: Int) {
 
         val getImagesJob = CoroutineScope(Dispatchers.IO).async {
             val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
@@ -241,7 +250,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
 
             searchParameters.userId = userId
             searchParameters.media = "photos"
-            val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, currentGridPage)
+            val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, page)
                 .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
                 .toMutableList()
 
@@ -259,19 +268,23 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
                 ViewModelProvider(this@ImageGridFragment).get(ImagesViewModel::class.java)
 
             val currentlist = listViewModel.currentImagesList.value
+            val currentSize = listViewModel.currentImagesList.value?.size
 
+            val newList = currentlist?.plus(photos) ?: photos
             listViewModel.setImagesList(currentlist?.plus(photos) ?: photos)
 
             // build the recycler view and bind the adapter to it so we
             // can draw the individual images from the photo metadata
             // returned by the API
             recyclerView = binding.photosRecyclerView
-            recyclerView.adapter = PhotosAdapter(
-                this@ImageGridFragment,
-                listViewModel.currentImagesList.value!!.toMutableList()
-            )
+            (recyclerView.adapter as PhotosAdapter).photos.addAll(photos)
+
+            if (page > 1)
+                (recyclerView.adapter as PhotosAdapter).notifyItemRangeChanged(currentSize!!,
+                    listViewModel.currentImagesList.value!!.size - 1)
 
             binding.progress.visibility = View.GONE
+            binding.progressMore.visibility = View.GONE
         }
     }
 
@@ -279,7 +292,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
         const val IMAGE_GRID_PREFS = "ImageGridPrefs"
         const val IMAGE_IS_GRID = "ImagesIsGrid"
         const val ARG_USER_ID = "user_id"
-        const val GRID_PAGE_SIZE = 50
+        const val GRID_PAGE_SIZE = 12
         const val ROWS_PER_COLUMN_PORTRAIT = 2
         const val ROWS_PER_COLUMN_LANDSCAPE = 3
 

@@ -21,11 +21,15 @@ import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuth1RequestToken
 import com.github.scribejava.core.oauth.OAuth10aService
+import dagger.internal.DaggerGenerated
 import edu.bu.cs683.myflickr.BuildConfig
 import edu.bu.cs683.myflickr.ImagesActivity
 import edu.bu.cs683.myflickr.MainActivity
 import edu.bu.cs683.myflickr.R
+import edu.bu.cs683.myflickr.data.ApplicationGraph
+import edu.bu.cs683.myflickr.data.DaggerApplicationGraph
 import edu.bu.cs683.myflickr.data.FlickrApiState
+import edu.bu.cs683.myflickr.data.FlickrRepository
 import edu.bu.cs683.myflickr.databinding.FragmentAuthBinding
 import kotlinx.coroutines.*
 
@@ -51,12 +55,16 @@ class AuthFragment : Fragment() {
 
     lateinit var accessToken: OAuth1AccessToken
 
+    val applicationGraph: ApplicationGraph = DaggerApplicationGraph.create()
+    val flickrRepository: FlickrRepository = applicationGraph.getFlickrRepository()
+
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         // Inflate the layout for this fragment
         // return inflater.inflate(R.layout.fragment_auth, container, false)
         _binding = FragmentAuthBinding.inflate(inflater, container, false)
@@ -97,6 +105,9 @@ class AuthFragment : Fragment() {
                 userId = user.id
                 Log.d(MainActivity.TAG, "user = ${user.realName}")
 
+                flickrRepository.setBaseDir(requireContext().filesDir)
+                flickrRepository.setSession(accessToken, user)
+
                 // let's set our API state holder
                 FlickrApiState.instance = FlickrApiState(user, flickr, accessToken)
                 // uncomment the following lines to test the API calls working
@@ -107,6 +118,7 @@ class AuthFragment : Fragment() {
                 return@async accessToken
             }.join()
         }
+
 
         Toast.makeText(
             activity,

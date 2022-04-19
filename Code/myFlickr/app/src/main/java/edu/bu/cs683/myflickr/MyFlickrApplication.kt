@@ -1,6 +1,7 @@
 package edu.bu.cs683.myflickr
 
 import android.app.Application
+import edu.bu.cs683.myflickr.data.ApplicationGraph
 import edu.bu.cs683.myflickr.data.PhotoRepository
 
 /**

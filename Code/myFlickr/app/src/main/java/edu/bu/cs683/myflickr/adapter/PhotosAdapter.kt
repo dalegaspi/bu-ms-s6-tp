@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.databinding.PhotoBinding
 import edu.bu.cs683.myflickr.listener.OneImageDetailListener
@@ -29,6 +30,7 @@ class PhotosAdapter(val oneImageDetailListener: OneImageDetailListener,
                     .load(url)
                     .fit()
                     .centerCrop()
+                    .placeholder(R.drawable.image_outline)
                     .into(binding.imageView)
             }
 

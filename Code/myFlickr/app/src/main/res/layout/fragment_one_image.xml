@@ -32,7 +32,8 @@ android:layout_height="fill_parent"  tools:context=".fragment.OneImageFragment">
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/oneImageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:src="@drawable/image_outline" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -46,7 +47,7 @@ android:layout_height="fill_parent"  tools:context=".fragment.OneImageFragment">
             android:id="@+id/oneImageDescText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-"
+            android:text=""
             android:textStyle="bold"
             android:textColor="#FFFFFF"/>
 

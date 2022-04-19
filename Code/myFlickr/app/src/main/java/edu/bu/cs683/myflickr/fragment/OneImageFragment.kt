@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import com.flickr4java.flickr.Flickr
 import com.flickr4java.flickr.REST
 import edu.bu.cs683.myflickr.BuildConfig
+import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.databinding.FragmentOneImageBinding
 import kotlinx.coroutines.CoroutineScope
@@ -89,29 +90,7 @@ class OneImageFragment : Fragment() {
                 binding.oneImageDescText.text = title
             }
         }
-        // this is hopefully replaced with co-routine
-       /*
-        object : AsyncTask<Void, Void, Photo>() {
-            override fun doInBackground(vararg p0: Void?): Photo {
-                val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
-                val photosInterface = flickr.photosInterface
 
-                photosInterface.getPhoto(imageId)
-                val flickrPhoto = photosInterface.getPhoto(imageId)
-                val photo = Photo(id = flickrPhoto.id, url = flickrPhoto.mediumUrl, title = flickrPhoto.title)
-                return photo
-            }
-
-            override fun onPostExecute(photo: Photo) {
-                with(photo) {
-                    Picasso.get()
-                        .load(url)
-                        .into(binding.oneImageView)
-
-                    binding.oneImageDescText.text = title
-                }
-            }
-        }.execute()*/
     }
 
     companion object {

@@ -6,6 +6,7 @@ import com.flickr4java.flickr.RequestContext
 import com.flickr4java.flickr.auth.Auth
 import com.flickr4java.flickr.auth.AuthInterface
 import com.flickr4java.flickr.people.User
+import com.flickr4java.flickr.photos.PhotosInterface
 import com.flickr4java.flickr.util.FileAuthStore
 import com.github.scribejava.apis.FlickrApi
 import com.github.scribejava.core.builder.ServiceBuilder
@@ -28,6 +29,7 @@ class FlickrRepository @Inject constructor() {
         .build(FlickrApi.instance(FlickrApi.FlickrPerm.READ))
     val flickr: Flickr = Flickr(apiKey, apiSecret, REST())
     val authInterface: AuthInterface = flickr.authInterface
+    val photosInterface: PhotosInterface = flickr.photosInterface
 
     var _authStore: FileAuthStore? = null
     val authStore get() = _authStore!!
@@ -77,6 +79,26 @@ class FlickrRepository @Inject constructor() {
         _user = auth.user
         RequestContext.getRequestContext().auth = auth
     }
+
+    fun getPhoto(imageId: String): Photo {
+        val flickrPhoto = photosInterface.getPhoto(imageId)
+        val exif = photosInterface.getExif(imageId, apiSecret)
+
+        val photo = Photo(id = flickrPhoto.id,
+            url = flickrPhoto.mediumUrl,
+            title = flickrPhoto.title,
+            description = flickrPhoto.description,
+            camera = exif.find { it.tag == "Model"}?.raw,
+            lens = exif.find { it.tag == "LensModel"}?.raw,
+            shutterSpeed = exif.find { it.tag == "ExposureTime"}?.clean,
+            aperture = exif.find { it.tag == "FNumber"}?.clean,
+            whiteBalance = exif.find { it.tag == "WhiteBalance"}?.raw,
+            flash = exif.find { it.tag == "Flash"}?.raw
+        )
+
+        return photo
+    }
+
 
     companion object {
         const val AUTHS_DIR = "myFlickr"

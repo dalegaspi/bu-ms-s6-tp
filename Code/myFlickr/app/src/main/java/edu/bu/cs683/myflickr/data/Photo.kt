@@ -8,5 +8,12 @@ data class Photo(
     @PrimaryKey
     val id: String,
     val url: String,
-    val title: String
+    val title: String,
+    val description: String? = null,
+    val camera: String? = null,
+    val lens: String? = null,
+    val aperture: String? = null,
+    val flash: String? = null,
+    val shutterSpeed: String? = null,
+    val whiteBalance: String? = null
 )

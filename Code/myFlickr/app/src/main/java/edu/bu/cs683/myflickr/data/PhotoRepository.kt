@@ -15,7 +15,7 @@ class PhotoRepository private constructor(context: Context) {
         context.applicationContext,
         PhotoDatabase::class.java,
         DATABASE_NAME
-    ).build()
+    ).fallbackToDestructiveMigration().build()
 
     private val photoDao = database.photoDao()
 

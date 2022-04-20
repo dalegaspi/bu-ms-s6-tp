@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:animateLayoutChanges="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainlayout"
     android:layout_width="fill_parent"
@@ -79,7 +80,7 @@
             android:layout_marginBottom="10pt"
             android:singleLine="false"
             android:paddingLeft="10dp"
-            android:text="I am Spartacus."
+            android:text="-"
             android:textColor="@color/white"
             android:textIsSelectable="true"
             android:textSize="16sp" />
@@ -150,7 +151,7 @@
                         android:maxWidth="100sp"
                         android:paddingLeft="0dp"
                         android:singleLine="true"
-                        android:text="Nikon Z 9"
+                        android:text="-"
                         android:textColor="@color/white"
                         android:textIsSelectable="true"
                         android:textSize="16sp" />
@@ -203,7 +204,7 @@
                         android:maxWidth="100sp"
                         android:paddingLeft="0dp"
 
-                        android:text="NIKKOR Z 50mm f/1.8 S"
+                        android:text="-"
 
                         android:textColor="@color/white"
                         android:textIsSelectable="true"
@@ -255,7 +256,7 @@
                         android:layout_marginRight="10pt"
                         android:layout_marginBottom="5pt"
                         android:paddingLeft="0dp"
-                        android:text="1.8"
+                        android:text="-"
                         android:textColor="@color/white"
                         android:textIsSelectable="true"
                         android:textSize="16sp" />
@@ -361,7 +362,7 @@
                         android:paddingLeft="0dp"
                         android:singleLine="false"
 
-                        android:text="On, Return Detected"
+                        android:text="-"
                         android:textColor="@color/white"
                         android:textIsSelectable="true"
                         android:textSize="16sp" />
@@ -415,7 +416,7 @@
                         android:maxWidth="100sp"
                         android:paddingLeft="0dp"
                         android:singleLine="true"
-                        android:text="Auto"
+                        android:text="-"
                         android:textColor="@color/white"
                         android:textIsSelectable="true"
                         android:textSize="16sp" />

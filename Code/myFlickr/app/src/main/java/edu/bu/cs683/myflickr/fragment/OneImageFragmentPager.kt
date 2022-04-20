@@ -63,9 +63,11 @@ class OneImageFragmentPager : Fragment() {
                 if (imagesBrowsed.containsKey(position)) {
                     imageId = imagesBrowsed[position]
                 } else {
-                    val nextImage = nextImage()
-                    imagesBrowsed[position] = nextImage
-                    imageId = nextImage
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val nextImage = nextImage()
+                        imagesBrowsed[position] = nextImage
+                        imageId = nextImage
+                    }
                 }
 
                 super.onPageSelected(position)
@@ -73,22 +75,21 @@ class OneImageFragmentPager : Fragment() {
         })
     }
 
-    private fun nextImage(): String {
+    suspend fun nextImage(): String {
         // Toast.makeText(activity, "Get next photo called", Toast.LENGTH_SHORT).show()
-        return runBlocking {
-            val getImageJob = CoroutineScope(Dispatchers.IO).async {
-                val flickr =
-                    Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
-                val photosInterface = flickr.photosInterface
 
-                photosInterface.getPhoto(imageId)
-                val context = photosInterface.getContext(imageId)
+        val getImageJob = CoroutineScope(Dispatchers.IO).async {
+            val flickr =
+                Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
+            val photosInterface = flickr.photosInterface
 
-                return@async context.previousPhoto.id
-            }.await()
+            photosInterface.getPhoto(imageId)
+            val context = photosInterface.getContext(imageId)
 
-            return@runBlocking getImageJob
+            return@async context.previousPhoto.id
         }
+
+        return getImageJob.await()
     }
 
     private inner class ScreenSlidePagerAdapter(fa: FragmentActivity) : FragmentStateAdapter(fa) {

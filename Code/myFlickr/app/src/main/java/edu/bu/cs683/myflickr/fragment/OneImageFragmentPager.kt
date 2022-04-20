@@ -13,7 +13,6 @@ import com.flickr4java.flickr.REST
 import edu.bu.cs683.myflickr.BuildConfig
 import edu.bu.cs683.myflickr.databinding.FragmentOneImagePagerBinding
 import kotlinx.coroutines.*
-import java.lang.Integer.max
 
 /**
  * Fragment for one image
@@ -53,23 +52,29 @@ class OneImageFragmentPager : Fragment() {
     }
 
     var maxPosition: Int = 0
+    val imagesBrowsed: MutableMap<Int, String> = mutableMapOf()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.oneImageViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
 
-                // Toast.makeText(activity, "Current Page is going to ${position}", Toast.LENGTH_SHORT).show()
-                if (position > maxPosition)
-                    imageId = nextImage()
+                // Toast.makeText(activity, "Current Page is going to ${position}; maxPosition is ${maxPosition}", Toast.LENGTH_SHORT).show()
+                if (imagesBrowsed.containsKey(position)) {
+                    imageId = imagesBrowsed[position]
+                } else {
+                    val nextImage = nextImage()
+                    imagesBrowsed[position] = nextImage
+                    imageId = nextImage
+                }
 
-                maxPosition = max(position, maxPosition)
                 super.onPageSelected(position)
             }
         })
     }
 
     private fun nextImage(): String {
+        // Toast.makeText(activity, "Get next photo called", Toast.LENGTH_SHORT).show()
         return runBlocking {
             val getImageJob = CoroutineScope(Dispatchers.IO).async {
                 val flickr =

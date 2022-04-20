@@ -21,7 +21,6 @@ import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuth1RequestToken
 import com.github.scribejava.core.oauth.OAuth10aService
-import dagger.internal.DaggerGenerated
 import edu.bu.cs683.myflickr.BuildConfig
 import edu.bu.cs683.myflickr.ImagesActivity
 import edu.bu.cs683.myflickr.MainActivity
@@ -118,7 +117,6 @@ class AuthFragment : Fragment() {
                 return@async accessToken
             }.join()
         }
-
 
         Toast.makeText(
             activity,

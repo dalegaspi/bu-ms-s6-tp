@@ -9,8 +9,10 @@ import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.databinding.PhotoBinding
 import edu.bu.cs683.myflickr.listener.OneImageDetailListener
 
-class PhotosAdapter(val oneImageDetailListener: OneImageDetailListener,
-                    val photos: MutableList<Photo> = mutableListOf()) : RecyclerView.Adapter<PhotosAdapter.PhotosViewHolder>() {
+class PhotosAdapter(
+    val oneImageDetailListener: OneImageDetailListener,
+    val photos: MutableList<Photo> = mutableListOf()
+) : RecyclerView.Adapter<PhotosAdapter.PhotosViewHolder>() {
     val IMAGE_SIDE_PX = 400
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotosViewHolder {

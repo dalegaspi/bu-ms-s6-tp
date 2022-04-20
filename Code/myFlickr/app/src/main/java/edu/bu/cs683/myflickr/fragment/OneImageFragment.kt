@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import com.flickr4java.flickr.Flickr
 import com.flickr4java.flickr.REST
 import edu.bu.cs683.myflickr.BuildConfig
-import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.databinding.FragmentOneImageBinding
 import kotlinx.coroutines.CoroutineScope
@@ -90,7 +89,6 @@ class OneImageFragment : Fragment() {
                 binding.oneImageDescText.text = title
             }
         }
-
     }
 
     companion object {

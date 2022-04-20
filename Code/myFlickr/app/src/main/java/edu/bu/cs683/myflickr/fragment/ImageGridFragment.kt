@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -108,7 +107,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
 
         binding.photosRecyclerView.addOnScrollListener(object : EndlessRecyclerViewScrollListener(layoutManager) {
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
-                //Toast.makeText(activity, "Loading page $page with $totalItemsCount.", Toast.LENGTH_SHORT).show()
+                // Toast.makeText(activity, "Loading page $page with $totalItemsCount.", Toast.LENGTH_SHORT).show()
                 Log.d(TAG, "Loading page $page with $totalItemsCount")
                 if (page > 1)
                     binding.progressMore.visibility = View.VISIBLE
@@ -116,7 +115,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             }
         })
         binding.swipeContainer.setOnRefreshListener {
-            //binding.progress.visibility = View.VISIBLE
+            // binding.progress.visibility = View.VISIBLE
             binding.progressMore.visibility = View.VISIBLE
             loadImages(1)
             Toast.makeText(activity, "Image catalog retrieval complete.", Toast.LENGTH_SHORT).show()
@@ -280,8 +279,10 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             (recyclerView.adapter as PhotosAdapter).photos.addAll(photos)
 
             if (page > 1)
-                (recyclerView.adapter as PhotosAdapter).notifyItemRangeChanged(currentSize!!,
-                    listViewModel.currentImagesList.value!!.size - 1)
+                (recyclerView.adapter as PhotosAdapter).notifyItemRangeChanged(
+                    currentSize!!,
+                    listViewModel.currentImagesList.value!!.size - 1
+                )
 
             binding.progress.visibility = View.GONE
             binding.progressMore.visibility = View.GONE

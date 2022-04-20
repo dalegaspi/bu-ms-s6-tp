@@ -21,10 +21,7 @@ import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuth1RequestToken
 import com.github.scribejava.core.oauth.OAuth10aService
-import edu.bu.cs683.myflickr.BuildConfig
-import edu.bu.cs683.myflickr.ImagesActivity
-import edu.bu.cs683.myflickr.MainActivity
-import edu.bu.cs683.myflickr.R
+import edu.bu.cs683.myflickr.*
 import edu.bu.cs683.myflickr.data.ApplicationGraph
 import edu.bu.cs683.myflickr.data.DaggerApplicationGraph
 import edu.bu.cs683.myflickr.data.FlickrApiState
@@ -54,8 +51,7 @@ class AuthFragment : Fragment() {
 
     lateinit var accessToken: OAuth1AccessToken
 
-    val applicationGraph: ApplicationGraph = DaggerApplicationGraph.create()
-    val flickrRepository: FlickrRepository = applicationGraph.getFlickrRepository()
+    private lateinit var flickrRepository: FlickrRepository
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
@@ -69,7 +65,7 @@ class AuthFragment : Fragment() {
         _binding = FragmentAuthBinding.inflate(inflater, container, false)
 
         webview = binding.authWebView
-
+        flickrRepository = (activity?.application as MyFlickrApplication).flickrRepository
         // these next 2 are very important otherwise flickr website will not
         // be able to load the OAuth pages and for the webview be able to intercept
         // the OAuth tokens

@@ -7,6 +7,16 @@
     android:foregroundGravity="bottom"
     android:orientation="vertical">
 
+    <ProgressBar
+        android:id="@+id/oneImageProgress"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:maxWidth="24dp"
+        android:minWidth="24dp"
+        android:visibility="gone" />
+
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/oneImageView"
         android:layout_width="fill_parent"
@@ -74,10 +84,21 @@
             android:textIsSelectable="true"
             android:textSize="16sp" />
 
+        <Switch
+            android:id="@+id/showMetadata"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:layout_marginLeft="10pt"
+            android:layout_marginRight="10pt"
+            android:layout_marginBottom="5pt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Metadata" />
+
         <androidx.gridlayout.widget.GridLayout
             android:id="@+id/metadataGrid"
             android:layout_width="match_parent"
-
+            android:animateLayoutChanges="true"
             android:layout_height="match_parent"
             app:columnCount="2"
             app:rowCount="4">

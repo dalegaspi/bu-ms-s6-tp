@@ -26,9 +26,11 @@ import com.flickr4java.flickr.photos.SearchParameters
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import edu.bu.cs683.myflickr.BuildConfig
 import edu.bu.cs683.myflickr.MainActivity
+import edu.bu.cs683.myflickr.MyFlickrApplication
 import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.adapter.EndlessRecyclerViewScrollListener
 import edu.bu.cs683.myflickr.adapter.PhotosAdapter
+import edu.bu.cs683.myflickr.data.FlickrRepository
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.data.PhotoRepository
 import edu.bu.cs683.myflickr.databinding.FragmentImageGridBinding
@@ -55,6 +57,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
 
     var currentGridPage = 1
 
+    private lateinit var flickrRepository: FlickrRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -69,6 +72,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     ): View? {
         _binding = FragmentImageGridBinding.inflate(inflater, container, false)
         loadPrefs()
+        flickrRepository = (activity?.application as MyFlickrApplication).flickrRepository
         return binding.root
     }
 

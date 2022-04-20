@@ -1,6 +1,7 @@
 package edu.bu.cs683.myflickr.fragment
 
 import android.annotation.SuppressLint
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -62,12 +63,19 @@ class OneImageFragment : Fragment() {
             parentFragmentManager.popBackStack()
             true
         }
+
+        binding.metadataGrid.visibility = if (binding.showMetadata.isChecked) View.VISIBLE else View.GONE
+
+        binding.showMetadata.setOnCheckedChangeListener { _, b ->
+            binding.metadataGrid.visibility = if (b) View.VISIBLE else View.GONE
+        }
     }
 
     @SuppressLint("StaticFieldLeak")
     fun loadImage() {
         // this goes to call the flickr API to get the photo
         // with the specified ID then updated the ImageView on callback
+        binding.oneImageProgress.visibility = View.VISIBLE
         val getImageJob = CoroutineScope(Dispatchers.IO).async {
             val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
             val photosInterface = flickr.photosInterface
@@ -87,6 +95,7 @@ class OneImageFragment : Fragment() {
                     .into(binding.oneImageView)
 
                 binding.oneImageDescText.text = title
+                binding.oneImageProgress.visibility = View.VISIBLE
             }
         }
     }

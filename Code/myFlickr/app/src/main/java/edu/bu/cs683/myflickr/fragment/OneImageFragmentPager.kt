@@ -51,25 +51,39 @@ class OneImageFragmentPager : Fragment() {
         return binding.root
     }
 
-    var maxPosition: Int = 0
-    val imagesBrowsed: MutableMap<Int, String> = mutableMapOf()
+    val imagesBrowsed: MutableMap<Int, Pair<String, OneImageFragment>> = mutableMapOf()
+    fun processImageOnPosition(position: Int) {
+        // Toast.makeText(activity, "Current Page is going to ${position}; maxPosition is ${maxPosition}", Toast.LENGTH_SHORT).show()
+
+        if (imagesBrowsed.containsKey(position)) {
+            imageId = imagesBrowsed[position]?.first
+        } else {
+            val jobGetOneImage = CoroutineScope(Dispatchers.IO).async {
+                val nextImage = nextImage()
+                val args = Bundle()
+                args.putString(OneImageFragment.ARG_IMAGE_ID, imageId)
+                val fragment = OneImageFragment()
+                fragment.arguments = args
+
+                imagesBrowsed[position] = Pair(nextImage, fragment)
+                imageId = nextImage
+            }
+
+            // i don't like this part but the issue here is that ScreenSlidePagerAdapter::createFragment
+            // is called before this is finished; so we have to block :-( I probably should spend
+            // more time at some point to understand this ViewPager better to avoid this
+            runBlocking {
+                jobGetOneImage.await()
+            }
+        }
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        processImageOnPosition(0)
         binding.oneImageViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-
-                // Toast.makeText(activity, "Current Page is going to ${position}; maxPosition is ${maxPosition}", Toast.LENGTH_SHORT).show()
-                if (imagesBrowsed.containsKey(position)) {
-                    imageId = imagesBrowsed[position]
-                } else {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        val nextImage = nextImage()
-                        imagesBrowsed[position] = nextImage
-                        imageId = nextImage
-                    }
-                }
-
+                processImageOnPosition(position)
                 super.onPageSelected(position)
             }
         })
@@ -96,14 +110,13 @@ class OneImageFragmentPager : Fragment() {
         override fun getItemCount(): Int = 1000
 
         override fun createFragment(position: Int): Fragment {
-            val args = Bundle()
-            args.putString(OneImageFragment.ARG_IMAGE_ID, imageId)
-            val fragment = OneImageFragment()
-            fragment.arguments = args
 
-            return fragment
+            processImageOnPosition(position)
+
+            return imagesBrowsed[position]!!.second
         }
     }
+
     companion object {
         const val ARG_USER_ID = "user_id"
         const val ARG_IMAGE_ID = "image_id"

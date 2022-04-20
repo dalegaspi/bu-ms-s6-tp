@@ -6,13 +6,16 @@ import com.flickr4java.flickr.RequestContext
 import com.flickr4java.flickr.auth.Auth
 import com.flickr4java.flickr.auth.AuthInterface
 import com.flickr4java.flickr.people.User
+import com.flickr4java.flickr.photos.Exif
 import com.flickr4java.flickr.photos.PhotosInterface
+import com.flickr4java.flickr.photos.SearchParameters
 import com.flickr4java.flickr.util.FileAuthStore
 import com.github.scribejava.apis.FlickrApi
 import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.oauth.OAuth10aService
 import edu.bu.cs683.myflickr.BuildConfig
+import edu.bu.cs683.myflickr.fragment.ImageGridFragment
 import java.io.File
 import javax.inject.Inject
 
@@ -84,23 +87,43 @@ class FlickrRepository @Inject constructor() {
         val flickrPhoto = photosInterface.getPhoto(imageId)
         val exif = photosInterface.getExif(imageId, apiSecret)
 
-        val photo = Photo(id = flickrPhoto.id,
-            url = flickrPhoto.mediumUrl,
-            title = flickrPhoto.title,
-            description = flickrPhoto.description,
-            camera = exif.find { it.tag == "Model"}?.raw,
-            lens = exif.find { it.tag == "LensModel"}?.raw,
-            shutterSpeed = exif.find { it.tag == "ExposureTime"}?.clean,
-            aperture = exif.find { it.tag == "FNumber"}?.clean,
-            whiteBalance = exif.find { it.tag == "WhiteBalance"}?.raw,
-            flash = exif.find { it.tag == "Flash"}?.raw
-        )
+        val photo = toPhoto(flickrPhoto, exif)
 
         return photo
     }
 
 
+
+    fun searchPhotos(page: Int, size: Int): List<Photo> {
+        val searchParameters = SearchParameters()
+
+        searchParameters.userId = user.id
+        searchParameters.media = "photos"
+        val photos = photosInterface.search(searchParameters, size, page)
+            .map {
+                val exif = photosInterface.getExif(it.id, apiSecret)
+                toPhoto(it, exif)
+            }
+
+        return photos
+
+    }
+
     companion object {
         const val AUTHS_DIR = "myFlickr"
+
+        fun toPhoto(flickrPhoto: com.flickr4java.flickr.photos.Photo, exif: Collection<Exif> ): Photo {
+            return Photo(id = flickrPhoto.id,
+                url = flickrPhoto.mediumUrl,
+                title = flickrPhoto.title,
+                description = flickrPhoto.description,
+                camera = exif.find { it.tag == "Model"}?.raw,
+                lens = exif.find { it.tag == "LensModel"}?.raw,
+                shutterSpeed = exif.find { it.tag == "ExposureTime"}?.clean,
+                aperture = exif.find { it.tag == "FNumber"}?.clean,
+                whiteBalance = exif.find { it.tag == "WhiteBalance"}?.raw,
+                flash = exif.find { it.tag == "Flash"}?.raw
+            )
+        }
     }
 }

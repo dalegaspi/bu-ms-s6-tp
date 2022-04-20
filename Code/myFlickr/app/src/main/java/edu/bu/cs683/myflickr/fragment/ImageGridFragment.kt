@@ -247,15 +247,17 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     private fun loadImages(page: Int) {
 
         val getImagesJob = CoroutineScope(Dispatchers.IO).async {
-            val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
-            val photosInterface = flickr.photosInterface
-            val searchParameters = SearchParameters()
+            //val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
+           // val photosInterface = flickr.photosInterface
+           // val searchParameters = SearchParameters()
 
-            searchParameters.userId = userId
-            searchParameters.media = "photos"
-            val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, page)
-                .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
-                .toMutableList()
+           // searchParameters.userId = userId
+           // searchParameters.media = "photos"
+            //val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, page)
+           //     .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
+            //    .toMutableList()
+
+            val photos = flickrRepository.searchPhotos(page, GRID_PAGE_SIZE).toMutableList()
 
             photos.forEach {
                 PhotoRepository.get().add(it)

@@ -40,7 +40,7 @@
             android:layout_marginLeft="10pt"
             android:layout_marginTop="5pt"
             android:layout_marginRight="10pt"
-            android:layout_marginBottom="5pt"
+            android:layout_marginBottom="10pt"
             android:paddingLeft="10dp"
             android:text=""
             android:textColor="@color/white"
@@ -66,7 +66,8 @@
             android:layout_marginLeft="10pt"
             android:layout_marginTop="5pt"
             android:layout_marginRight="10pt"
-            android:layout_marginBottom="5pt"
+            android:layout_marginBottom="10pt"
+            android:singleLine="false"
             android:paddingLeft="10dp"
             android:text="I am Spartacus."
             android:textColor="@color/white"
@@ -74,9 +75,10 @@
             android:textSize="16sp" />
 
         <androidx.gridlayout.widget.GridLayout
+            android:id="@+id/metadataGrid"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
 
+            android:layout_height="match_parent"
             app:columnCount="2"
             app:rowCount="4">
 
@@ -123,11 +125,11 @@
                         android:layout_marginTop="1pt"
                         android:layout_marginRight="10pt"
                         android:layout_marginBottom="5pt"
-                        android:paddingLeft="0dp"
-                        android:text="Nikon Z 9"
                         android:ellipsize="end"
                         android:maxWidth="100sp"
+                        android:paddingLeft="0dp"
                         android:singleLine="true"
+                        android:text="Nikon Z 9"
                         android:textColor="@color/white"
                         android:textIsSelectable="true"
                         android:textSize="16sp" />
@@ -177,10 +179,10 @@
                         android:layout_marginTop="1pt"
                         android:layout_marginRight="10pt"
                         android:layout_marginBottom="5pt"
-                        android:paddingLeft="0dp"
-                        android:text="NIKKOR Z 50mm f/1.8 S"
-
                         android:maxWidth="100sp"
+                        android:paddingLeft="0dp"
+
+                        android:text="NIKKOR Z 50mm f/1.8 S"
 
                         android:textColor="@color/white"
                         android:textIsSelectable="true"
@@ -289,6 +291,7 @@
                         android:textSize="16sp" />
                 </LinearLayout>
             </androidx.gridlayout.widget.GridLayout>
+
             <androidx.gridlayout.widget.GridLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -334,8 +337,8 @@
                         android:layout_marginBottom="5pt"
                         android:ellipsize="end"
                         android:maxWidth="100sp"
-                        android:singleLine="false"
                         android:paddingLeft="0dp"
+                        android:singleLine="false"
 
                         android:text="On, Return Detected"
                         android:textColor="@color/white"
@@ -387,11 +390,11 @@
                         android:layout_marginTop="1pt"
                         android:layout_marginRight="10pt"
                         android:layout_marginBottom="5pt"
-                        android:paddingLeft="0dp"
-                        android:text="Auto"
                         android:ellipsize="end"
                         android:maxWidth="100sp"
+                        android:paddingLeft="0dp"
                         android:singleLine="true"
+                        android:text="Auto"
                         android:textColor="@color/white"
                         android:textIsSelectable="true"
                         android:textSize="16sp" />

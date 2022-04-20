@@ -8,9 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.flickr4java.flickr.Flickr
-import com.flickr4java.flickr.REST
-import edu.bu.cs683.myflickr.BuildConfig
+import edu.bu.cs683.myflickr.MyFlickrApplication
+import edu.bu.cs683.myflickr.data.FlickrRepository
 import edu.bu.cs683.myflickr.databinding.FragmentOneImagePagerBinding
 import kotlinx.coroutines.*
 
@@ -22,7 +21,7 @@ import kotlinx.coroutines.*
 class OneImageFragmentPager : Fragment() {
     private var _binding: FragmentOneImagePagerBinding? = null
     private val binding get() = _binding!!
-
+    private lateinit var flickrRepository: FlickrRepository
     private var userId: String? = null
     private var imageId: String? = null
 
@@ -43,7 +42,7 @@ class OneImageFragmentPager : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentOneImagePagerBinding.inflate(inflater, container, false)
-
+        flickrRepository = (activity?.application as MyFlickrApplication).flickrRepository
         // The pager adapter, which provides the pages to the view pager widget.
         val pagerAdapter = ScreenSlidePagerAdapter(requireActivity())
         binding.oneImageViewPager.adapter = pagerAdapter
@@ -93,14 +92,14 @@ class OneImageFragmentPager : Fragment() {
         // Toast.makeText(activity, "Get next photo called", Toast.LENGTH_SHORT).show()
 
         val getImageJob = CoroutineScope(Dispatchers.IO).async {
-            val flickr =
-                Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
-            val photosInterface = flickr.photosInterface
+            // val flickr =
+            //    Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
+            // val photosInterface = flickr.photosInterface
 
-            photosInterface.getPhoto(imageId)
-            val context = photosInterface.getContext(imageId)
+            // flickr.getPhoto(imageId)
+            val context = flickrRepository.getContext(imageId!!)
 
-            return@async context.previousPhoto.id
+            return@async context!!.previousPhoto.id
         }
 
         return getImageJob.await()

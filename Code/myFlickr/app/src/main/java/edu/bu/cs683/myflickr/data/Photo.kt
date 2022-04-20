@@ -9,6 +9,7 @@ data class Photo(
     val id: String,
     val url: String,
     val title: String,
+    val isPublic: Boolean = true,
     val description: String? = null,
     val camera: String? = null,
     val lens: String? = null,

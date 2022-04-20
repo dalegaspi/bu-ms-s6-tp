@@ -7,6 +7,7 @@ import com.flickr4java.flickr.auth.Auth
 import com.flickr4java.flickr.auth.AuthInterface
 import com.flickr4java.flickr.people.User
 import com.flickr4java.flickr.photos.Exif
+import com.flickr4java.flickr.photos.PhotoContext
 import com.flickr4java.flickr.photos.PhotosInterface
 import com.flickr4java.flickr.photos.SearchParameters
 import com.flickr4java.flickr.util.FileAuthStore
@@ -15,7 +16,6 @@ import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.oauth.OAuth10aService
 import edu.bu.cs683.myflickr.BuildConfig
-import edu.bu.cs683.myflickr.fragment.ImageGridFragment
 import java.io.File
 import javax.inject.Inject
 
@@ -83,7 +83,8 @@ class FlickrRepository @Inject constructor() {
         RequestContext.getRequestContext().auth = auth
     }
 
-    fun getPhoto(imageId: String): Photo {
+    fun getPhotoWithFullMetadata(imageId: String): Photo {
+        RequestContext.getRequestContext().auth = auth
         val flickrPhoto = photosInterface.getPhoto(imageId)
         val exif = photosInterface.getExif(imageId, apiSecret)
 
@@ -92,7 +93,27 @@ class FlickrRepository @Inject constructor() {
         return photo
     }
 
+    fun getPhotoWithBasicMetadata(imageId: String): Photo {
+        val flickrPhoto = photosInterface.getPhoto(imageId)
+        val photo = toPhoto(flickrPhoto, emptyList())
 
+        return photo
+    }
+
+    fun getFullMetadataForPhotos(images: List<Photo>): List<Photo> {
+        RequestContext.getRequestContext().auth = auth
+        val photos = images.map {
+            val exif = photosInterface.getExif(it.id, apiSecret)
+            addExifToPhoto(it, exif)
+        }
+
+        return photos
+    }
+
+    fun getContext(imageId: String): PhotoContext? {
+        RequestContext.getRequestContext().auth = auth
+        return photosInterface.getContext(imageId)
+    }
 
     fun searchPhotos(page: Int, size: Int): List<Photo> {
         val searchParameters = SearchParameters()
@@ -101,28 +122,36 @@ class FlickrRepository @Inject constructor() {
         searchParameters.media = "photos"
         val photos = photosInterface.search(searchParameters, size, page)
             .map {
-                val exif = photosInterface.getExif(it.id, apiSecret)
-                toPhoto(it, exif)
+                toPhoto(it, emptyList())
             }
 
         return photos
-
     }
 
     companion object {
         const val AUTHS_DIR = "myFlickr"
 
-        fun toPhoto(flickrPhoto: com.flickr4java.flickr.photos.Photo, exif: Collection<Exif> ): Photo {
-            return Photo(id = flickrPhoto.id,
-                url = flickrPhoto.mediumUrl,
-                title = flickrPhoto.title,
-                description = flickrPhoto.description,
-                camera = exif.find { it.tag == "Model"}?.raw,
-                lens = exif.find { it.tag == "LensModel"}?.raw,
-                shutterSpeed = exif.find { it.tag == "ExposureTime"}?.clean,
-                aperture = exif.find { it.tag == "FNumber"}?.clean,
-                whiteBalance = exif.find { it.tag == "WhiteBalance"}?.raw,
-                flash = exif.find { it.tag == "Flash"}?.raw
+        fun addExifToPhoto(photo: Photo, exif: Collection<Exif>): Photo {
+            return photo.copy(
+                camera = exif.find { it.tag == "Model" }?.raw,
+                lens = exif.find { it.tag == "LensModel" }?.raw,
+                shutterSpeed = exif.find { it.tag == "ExposureTime" }?.clean,
+                aperture = exif.find { it.tag == "FNumber" }?.clean,
+                whiteBalance = exif.find { it.tag == "WhiteBalance" }?.raw,
+                flash = exif.find { it.tag == "Flash" }?.raw
+            )
+        }
+
+        fun toPhoto(flickrPhoto: com.flickr4java.flickr.photos.Photo, exif: Collection<Exif>): Photo {
+            return addExifToPhoto(
+                Photo(
+                    id = flickrPhoto.id,
+                    url = flickrPhoto.mediumUrl,
+                    title = flickrPhoto.title,
+                    description = flickrPhoto.description,
+                    isPublic = flickrPhoto.isPublicFlag
+                ),
+                exif
             )
         }
     }

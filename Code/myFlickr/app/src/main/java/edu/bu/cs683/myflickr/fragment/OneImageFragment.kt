@@ -7,22 +7,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.flickr4java.flickr.Flickr
-import com.flickr4java.flickr.REST
-import edu.bu.cs683.myflickr.BuildConfig
 import edu.bu.cs683.myflickr.MyFlickrApplication
 import edu.bu.cs683.myflickr.data.FlickrRepository
-import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.databinding.FragmentOneImageBinding
 import edu.bu.cs683.myflickr.viewmodel.ImageViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-
 
 /**
  * Fragment for one image
@@ -47,6 +41,15 @@ class OneImageFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val oneViewModel =
+            ViewModelProvider(requireActivity()).get(ImageViewModel::class.java)
+        oneViewModel.showMetadata.value ?.let {
+            binding.showMetadata.isChecked = it
+            binding.metadataGrid.visibility = if (it) View.VISIBLE else View.GONE
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -86,15 +89,10 @@ class OneImageFragment : Fragment() {
             oneViewModel.setShowMetadata(b)
         }
 
-
-
         oneViewModel.showMetadata.value ?.let {
             binding.showMetadata.isChecked = it
             binding.metadataGrid.visibility = if (it) View.VISIBLE else View.GONE
         }
-
-
-
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -104,7 +102,7 @@ class OneImageFragment : Fragment() {
         binding.oneImageProgress.visibility = View.VISIBLE
         val getImageJob = CoroutineScope(Dispatchers.IO).async {
 
-            val photo = imageId!!.let { flickrRepository.getPhoto(it) }
+            val photo = imageId!!.let { flickrRepository.getPhotoWithFullMetadata(it) }
             return@async photo
         }
         binding.metadataGrid.visibility = View.INVISIBLE
@@ -112,8 +110,8 @@ class OneImageFragment : Fragment() {
             val photo = getImageJob.await()
             with(photo) {
                 com.squareup.picasso.Picasso.get()
-                .load(url)
-                .into(binding.oneImageView)
+                    .load(url)
+                    .into(binding.oneImageView)
                 description?. let {
                     binding.oneImageDesc.text = it
                 }
@@ -126,9 +124,8 @@ class OneImageFragment : Fragment() {
                 binding.oneImageFlash.text = flash
                 binding.oneImageLens.text = lens
                 binding.oneImageProgress.visibility = View.VISIBLE
-
-
-
+                if (!isPublic)
+                    binding.imagePrivate.visibility = View.VISIBLE
             }
         }
     }

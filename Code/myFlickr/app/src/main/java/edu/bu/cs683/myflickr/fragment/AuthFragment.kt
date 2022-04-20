@@ -22,8 +22,6 @@ import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuth1RequestToken
 import com.github.scribejava.core.oauth.OAuth10aService
 import edu.bu.cs683.myflickr.*
-import edu.bu.cs683.myflickr.data.ApplicationGraph
-import edu.bu.cs683.myflickr.data.DaggerApplicationGraph
 import edu.bu.cs683.myflickr.data.FlickrApiState
 import edu.bu.cs683.myflickr.data.FlickrRepository
 import edu.bu.cs683.myflickr.databinding.FragmentAuthBinding

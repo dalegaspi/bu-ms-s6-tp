@@ -1,6 +1,7 @@
 package edu.bu.cs683.myflickr.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
@@ -34,6 +35,13 @@ class PhotosAdapter(
                     .centerCrop()
                     .placeholder(R.drawable.image_outline)
                     .into(binding.imageView)
+
+                if (!isPublic) {
+                    binding.imagePrivate.imageAlpha = 160
+                    binding.imagePrivate.visibility = View.VISIBLE
+                } else {
+                    binding.imagePrivate.visibility = View.INVISIBLE
+                }
             }
 
             contentView.setOnClickListener {

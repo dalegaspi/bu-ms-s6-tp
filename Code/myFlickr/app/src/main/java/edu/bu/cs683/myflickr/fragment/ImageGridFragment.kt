@@ -1,5 +1,6 @@
 package edu.bu.cs683.myflickr.fragment
 
+import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -20,11 +21,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.flickr4java.flickr.Flickr
-import com.flickr4java.flickr.REST
-import com.flickr4java.flickr.photos.SearchParameters
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import edu.bu.cs683.myflickr.BuildConfig
 import edu.bu.cs683.myflickr.MainActivity
 import edu.bu.cs683.myflickr.MyFlickrApplication
 import edu.bu.cs683.myflickr.R
@@ -89,6 +86,8 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val swipeContainer = binding.swipeContainer
+        swipeContainer.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
         val listViewModel =
             ViewModelProvider(this).get(ImagesViewModel::class.java)
 
@@ -247,20 +246,22 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     private fun loadImages(page: Int) {
 
         val getImagesJob = CoroutineScope(Dispatchers.IO).async {
-            //val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
-           // val photosInterface = flickr.photosInterface
-           // val searchParameters = SearchParameters()
+            // val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
+            // val photosInterface = flickr.photosInterface
+            // val searchParameters = SearchParameters()
 
-           // searchParameters.userId = userId
-           // searchParameters.media = "photos"
-            //val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, page)
-           //     .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
+            // searchParameters.userId = userId
+            // searchParameters.media = "photos"
+            // val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, page)
+            //     .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
             //    .toMutableList()
 
             val photos = flickrRepository.searchPhotos(page, GRID_PAGE_SIZE).toMutableList()
 
-            photos.forEach {
-                PhotoRepository.get().add(it)
+            CoroutineScope(Dispatchers.IO).launch {
+                flickrRepository.getFullMetadataForPhotos(photos).forEach {
+                    PhotoRepository.get().add(it)
+                }
             }
 
             return@async photos
@@ -276,7 +277,10 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             val currentSize = listViewModel.currentImagesList.value?.size
 
             val newList = currentlist?.plus(photos) ?: photos
-            listViewModel.setImagesList(currentlist?.plus(photos) ?: photos)
+            if (page > 1)
+                listViewModel.setImagesList(newList)
+            else
+                listViewModel.setImagesList(photos)
 
             // build the recycler view and bind the adapter to it so we
             // can draw the individual images from the photo metadata
@@ -284,11 +288,14 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             recyclerView = binding.photosRecyclerView
             (recyclerView.adapter as PhotosAdapter).photos.addAll(photos)
 
-            if (page > 1)
+            if (page > 1) {
                 (recyclerView.adapter as PhotosAdapter).notifyItemRangeChanged(
                     currentSize!!,
                     listViewModel.currentImagesList.value!!.size - 1
                 )
+            } else {
+                (recyclerView.adapter as PhotosAdapter).notifyDataSetChanged()
+            }
 
             binding.progress.visibility = View.GONE
             binding.progressMore.visibility = View.GONE

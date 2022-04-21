@@ -1,7 +1,6 @@
 package edu.bu.cs683.myflickr.data
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.room.Room
 import java.lang.IllegalStateException
 import java.util.concurrent.Executors
@@ -56,7 +55,6 @@ class PhotoRepository private constructor(context: Context) {
     fun edit(photo: Photo) {
         executor.execute {
             photoDao.editProject(photo)
-
         }
     }
 
@@ -69,6 +67,6 @@ class PhotoRepository private constructor(context: Context) {
     }
 
     fun getCameraBreakdown(): List<CameraCounts> {
-         return photoDao.getGroupCountsByCamera()
+        return photoDao.getGroupCountsByCamera()
     }
 }

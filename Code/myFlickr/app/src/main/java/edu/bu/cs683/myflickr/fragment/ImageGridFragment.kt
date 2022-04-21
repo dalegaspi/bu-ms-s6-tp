@@ -118,6 +118,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
                 loadImages(page + 1)
             }
         })
+
         binding.swipeContainer.setOnRefreshListener {
             // binding.progress.visibility = View.VISIBLE
             binding.progressMore.visibility = View.VISIBLE
@@ -247,18 +248,10 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             ROWS_PER_COLUMN_PORTRAIT
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun loadImages(page: Int) {
 
         val getImagesJob = CoroutineScope(Dispatchers.IO).async {
-            // val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
-            // val photosInterface = flickr.photosInterface
-            // val searchParameters = SearchParameters()
-
-            // searchParameters.userId = userId
-            // searchParameters.media = "photos"
-            // val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, page)
-            //     .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
-            //    .toMutableList()
 
             val photos = flickrRepository.searchPhotos(page, GRID_PAGE_SIZE).toMutableList()
 
@@ -290,15 +283,22 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             // can draw the individual images from the photo metadata
             // returned by the API
             recyclerView = binding.photosRecyclerView
-            (recyclerView.adapter as PhotosAdapter).photos.addAll(photos)
+            val adapter = recyclerView.adapter as PhotosAdapter
+
+            if (page == 1 && adapter.photos.isNotEmpty()) {
+                // this means we pulled down to refresh
+                adapter.photos.clear()
+            }
+
+            adapter.photos.addAll(photos)
 
             if (page > 1) {
-                (recyclerView.adapter as PhotosAdapter).notifyItemRangeChanged(
+                adapter.notifyItemRangeChanged(
                     currentSize!!,
                     listViewModel.currentImagesList.value!!.size - 1
                 )
             } else {
-                (recyclerView.adapter as PhotosAdapter).notifyDataSetChanged()
+                adapter.notifyDataSetChanged()
             }
 
             binding.progress.visibility = View.GONE

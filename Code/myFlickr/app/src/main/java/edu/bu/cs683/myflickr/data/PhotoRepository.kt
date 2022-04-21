@@ -56,14 +56,19 @@ class PhotoRepository private constructor(context: Context) {
     fun edit(photo: Photo) {
         executor.execute {
             photoDao.editProject(photo)
+
         }
     }
 
-    fun getAll(): LiveData<List<Photo>> {
-        return photoDao.getAllProjects()
+    fun getAll(): List<Photo> {
+        return photoDao.getAllPhotos()
     }
 
-    fun count(): LiveData<Int> {
+    fun count(): Int {
         return photoDao.count()
+    }
+
+    fun getCameraBreakdown(): List<CameraCounts> {
+         return photoDao.getGroupCountsByCamera()
     }
 }

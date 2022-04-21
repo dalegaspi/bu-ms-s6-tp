@@ -1,5 +1,6 @@
 package edu.bu.cs683.myflickr.data
 
+import android.webkit.CookieManager
 import com.flickr4java.flickr.Flickr
 import com.flickr4java.flickr.REST
 import com.flickr4java.flickr.RequestContext
@@ -10,6 +11,7 @@ import com.flickr4java.flickr.photos.Exif
 import com.flickr4java.flickr.photos.PhotoContext
 import com.flickr4java.flickr.photos.PhotosInterface
 import com.flickr4java.flickr.photos.SearchParameters
+import com.flickr4java.flickr.stats.Totals
 import com.flickr4java.flickr.util.FileAuthStore
 import com.github.scribejava.apis.FlickrApi
 import com.github.scribejava.core.builder.ServiceBuilder
@@ -69,6 +71,8 @@ class FlickrRepository @Inject constructor() {
         _authToken = null
         _user = null
         authStore.clearAll()
+        CookieManager.getInstance().removeAllCookies(null)
+        CookieManager.getInstance().flush()
     }
 
     private fun storeAuth() {
@@ -116,6 +120,7 @@ class FlickrRepository @Inject constructor() {
     }
 
     fun searchPhotos(page: Int, size: Int): List<Photo> {
+        RequestContext.getRequestContext().auth = auth
         val searchParameters = SearchParameters()
 
         searchParameters.userId = user.id
@@ -126,6 +131,21 @@ class FlickrRepository @Inject constructor() {
             }
 
         return photos
+    }
+
+    fun getViewStats(): Totals? {
+        RequestContext.getRequestContext().auth = auth
+        val stats = flickr.statsInterface.getTotalViews(null)
+        return stats
+    }
+
+    fun getTopFivePopularPhotos(): List<Pair<Photo, Int>> {
+        RequestContext.getRequestContext().auth = auth
+        val popular = flickr.statsInterface.getPopularPhotos(null, null, 5, 1)
+        return popular.map {
+            val flickrPhoto = photosInterface.getPhoto(it.id)
+            Pair(toPhoto(flickrPhoto, emptyList()), it.views)
+        }
     }
 
     companion object {

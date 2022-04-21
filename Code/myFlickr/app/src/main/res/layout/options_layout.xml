@@ -26,16 +26,26 @@
         android:minHeight="48dp"
         android:text="Show Images As Grid" />
 
+
     <Space
         android:layout_width="match_parent"
         android:layout_height="16sp" />
-
+<!--
     <Switch
         android:id="@+id/showMetadata"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="48dp"
-        android:text="Show Image Metadata" />
+        android:text="Show Image Metadata" /> -->
+
+    <TextView
+        android:id="@+id/loginInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="TextView"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <Space
         android:layout_width="match_parent"

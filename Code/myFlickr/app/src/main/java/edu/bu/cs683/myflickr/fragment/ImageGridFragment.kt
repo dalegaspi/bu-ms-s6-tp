@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.widget.Button
 import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
@@ -174,12 +175,15 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             bottomSheetDialog.dismiss()
         }
 
+        val loginInfo = bottomSheetDialog.findViewById<TextView>(R.id.loginInfo)
+        loginInfo?.text = "You are logged in as ${flickrRepository.user.username}"
         val logoutButton = bottomSheetDialog.findViewById<Button>(R.id.logOutButton)
         logoutButton?.setOnClickListener {
 
             // clear the cookies and it will log out the user
             CookieManager.getInstance().removeAllCookies(null)
             CookieManager.getInstance().flush()
+            flickrRepository.clearSession()
 
             Toast.makeText(
                 activity,

@@ -1,6 +1,7 @@
 package edu.bu.cs683.myflickr.fragment
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -45,11 +46,30 @@ class AuthFragment : Fragment() {
     lateinit var verifier: String
     lateinit var requestToken: OAuth1RequestToken
     lateinit var flickr: Flickr
-    lateinit var userId: String
+    var userId: String? = null
 
     lateinit var accessToken: OAuth1AccessToken
 
     private lateinit var flickrRepository: FlickrRepository
+
+    private fun savePrefs() {
+        val sharedPreferences = activity?.getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE)
+
+        sharedPreferences?.let {
+            Log.i(ImageGridFragment.TAG, "Saving $AUTH_PREFS = $userId")
+            it.edit()
+                .putString(AUTH_PREFS, userId)
+                .apply()
+        }
+    }
+
+    private fun loadPrefs() {
+        val sharedPreferences = activity?.getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE)
+        sharedPreferences?.let {
+            userId = it.getString(AUTH_PREFS, "")
+            Log.i(ImageGridFragment.TAG, "Setting from $AUTH_PREFS = $userId")
+        }
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
@@ -73,11 +93,30 @@ class AuthFragment : Fragment() {
             .apiSecret(apiSecret)
             .build(FlickrApi.instance(FlickrApi.FlickrPerm.READ))
 
-        // launch the webview to authenticate the user and/or authorize the app
-        // to get the users information and images
-        flickrAuthenticate()
+        // try to hydrate auth from file first
+        // if unsuccessful then auth by OAuth
+        loadAuthFromFile()
+        if (!flickrRepository.hasActiveSession()) {
+            // launch the webview to authenticate the user and/or authorize the app
+            // to get the users information and images
+            flickrAuthenticate()
+        } else {
+            launchImageGridActivity()
+        }
 
         return binding.root
+    }
+
+    fun loadAuthFromFile() {
+        runBlocking {
+            CoroutineScope(Dispatchers.IO).async {
+                loadPrefs()
+                userId?.let {
+                    flickrRepository.setBaseDir(requireContext().filesDir)
+                    flickrRepository.hydrateAuth(it)
+                }
+            }.join()
+        }
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -100,6 +139,7 @@ class AuthFragment : Fragment() {
 
                 flickrRepository.setBaseDir(requireContext().filesDir)
                 flickrRepository.setSession(accessToken, user)
+                savePrefs()
 
                 // let's set our API state holder
                 FlickrApiState.instance = FlickrApiState(user, flickr, accessToken)
@@ -117,6 +157,16 @@ class AuthFragment : Fragment() {
             "Token = " + accessToken.token + "Secret = " + accessToken.tokenSecret,
             Toast.LENGTH_LONG
         ).show()
+    }
+
+    fun launchImageGridActivity() {
+        // launch to the Images Activity and leave the current activity
+        val intent = Intent(activity, ImagesActivity::class.java)
+        intent.putExtra("user_id", userId)
+
+        // remove from back stack
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
     }
 
     fun flickrAuthenticate() {
@@ -153,13 +203,7 @@ class AuthFragment : Fragment() {
                                 // we extract the token here
                                 getAccessToken()
 
-                                // launch to the Images Activity and leave the current activity
-                                val intent = Intent(activity, ImagesActivity::class.java)
-                                intent.putExtra("user_id", userId)
-
-                                // remove from back stack
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                                startActivity(intent)
+                                launchImageGridActivity()
                                 return true
                             }
                         }
@@ -182,5 +226,6 @@ class AuthFragment : Fragment() {
 
     companion object {
         val TAG: String = AuthFragment::class.java.simpleName
+        const val AUTH_PREFS = "AuthPrefs"
     }
 }

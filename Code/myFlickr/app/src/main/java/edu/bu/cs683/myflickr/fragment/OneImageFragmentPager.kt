@@ -89,14 +89,7 @@ class OneImageFragmentPager : Fragment() {
     }
 
     suspend fun nextImage(): String {
-        // Toast.makeText(activity, "Get next photo called", Toast.LENGTH_SHORT).show()
-
         val getImageJob = CoroutineScope(Dispatchers.IO).async {
-            // val flickr =
-            //    Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
-            // val photosInterface = flickr.photosInterface
-
-            // flickr.getPhoto(imageId)
             val context = flickrRepository.getContext(imageId!!)
 
             return@async context!!.previousPhoto.id

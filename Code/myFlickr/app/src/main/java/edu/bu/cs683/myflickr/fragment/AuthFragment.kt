@@ -54,9 +54,8 @@ class AuthFragment : Fragment() {
 
     private fun savePrefs() {
         val sharedPreferences = activity?.getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE)
-
         sharedPreferences?.let {
-            Log.i(ImageGridFragment.TAG, "Saving $AUTH_PREFS = $userId")
+            Log.i(TAG, "Saving $AUTH_PREFS = $userId")
             it.edit()
                 .putString(AUTH_PREFS, userId)
                 .apply()
@@ -67,7 +66,7 @@ class AuthFragment : Fragment() {
         val sharedPreferences = activity?.getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE)
         sharedPreferences?.let {
             userId = it.getString(AUTH_PREFS, "")
-            Log.i(ImageGridFragment.TAG, "Setting from $AUTH_PREFS = $userId")
+            Log.i(TAG, "Setting from $AUTH_PREFS = $userId")
         }
     }
 

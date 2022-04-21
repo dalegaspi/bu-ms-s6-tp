@@ -1,5 +1,6 @@
 package edu.bu.cs683.myflickr.fragment
 
+import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.widget.Button
 import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
@@ -20,15 +22,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.flickr4java.flickr.Flickr
-import com.flickr4java.flickr.REST
-import com.flickr4java.flickr.photos.SearchParameters
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import edu.bu.cs683.myflickr.BuildConfig
 import edu.bu.cs683.myflickr.MainActivity
+import edu.bu.cs683.myflickr.MyFlickrApplication
 import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.adapter.EndlessRecyclerViewScrollListener
 import edu.bu.cs683.myflickr.adapter.PhotosAdapter
+import edu.bu.cs683.myflickr.data.FlickrRepository
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.data.PhotoRepository
 import edu.bu.cs683.myflickr.databinding.FragmentImageGridBinding
@@ -55,6 +55,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
 
     var currentGridPage = 1
 
+    private lateinit var flickrRepository: FlickrRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -69,6 +70,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     ): View? {
         _binding = FragmentImageGridBinding.inflate(inflater, container, false)
         loadPrefs()
+        flickrRepository = (activity?.application as MyFlickrApplication).flickrRepository
         return binding.root
     }
 
@@ -85,11 +87,13 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val swipeContainer = binding.swipeContainer
+        swipeContainer.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
         val listViewModel =
             ViewModelProvider(this).get(ImagesViewModel::class.java)
 
         userId?.let {
-            loadImages()
+            loadImages(1)
         }
 
         recyclerView = binding.photosRecyclerView
@@ -99,17 +103,25 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             else -> GridLayoutManager(context, columnCount)
         }
         recyclerView.layoutManager = layoutManager
+        recyclerView = binding.photosRecyclerView
+        recyclerView.adapter = PhotosAdapter(
+            this@ImageGridFragment,
+            ArrayList()
+        )
 
         binding.photosRecyclerView.addOnScrollListener(object : EndlessRecyclerViewScrollListener(layoutManager) {
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
-                Toast.makeText(activity, "Loading page $page with $totalItemsCount.", Toast.LENGTH_SHORT).show()
-                currentGridPage += 1
-                loadImages()
+                // Toast.makeText(activity, "Loading page $page with $totalItemsCount.", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "Loading page $page with $totalItemsCount")
+                if (page > 1)
+                    binding.progressMore.visibility = View.VISIBLE
+                loadImages(page + 1)
             }
         })
         binding.swipeContainer.setOnRefreshListener {
-            binding.progress.visibility = View.VISIBLE
-            loadImages()
+            // binding.progress.visibility = View.VISIBLE
+            binding.progressMore.visibility = View.VISIBLE
+            loadImages(1)
             Toast.makeText(activity, "Image catalog retrieval complete.", Toast.LENGTH_SHORT).show()
             binding.swipeContainer.isRefreshing = false
         }
@@ -163,12 +175,15 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             bottomSheetDialog.dismiss()
         }
 
+        val loginInfo = bottomSheetDialog.findViewById<TextView>(R.id.loginInfo)
+        loginInfo?.text = "You are logged in as ${flickrRepository.user.username}"
         val logoutButton = bottomSheetDialog.findViewById<Button>(R.id.logOutButton)
         logoutButton?.setOnClickListener {
 
             // clear the cookies and it will log out the user
             CookieManager.getInstance().removeAllCookies(null)
             CookieManager.getInstance().flush()
+            flickrRepository.clearSession()
 
             Toast.makeText(
                 activity,
@@ -232,21 +247,25 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
             ROWS_PER_COLUMN_PORTRAIT
     }
 
-    private fun loadImages() {
+    private fun loadImages(page: Int) {
 
         val getImagesJob = CoroutineScope(Dispatchers.IO).async {
-            val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
-            val photosInterface = flickr.photosInterface
-            val searchParameters = SearchParameters()
+            // val flickr = Flickr(BuildConfig.FLICKR_API_KEY, BuildConfig.FLICKR_API_SECRET, REST())
+            // val photosInterface = flickr.photosInterface
+            // val searchParameters = SearchParameters()
 
-            searchParameters.userId = userId
-            searchParameters.media = "photos"
-            val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, currentGridPage)
-                .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
-                .toMutableList()
+            // searchParameters.userId = userId
+            // searchParameters.media = "photos"
+            // val photos = photosInterface.search(searchParameters, GRID_PAGE_SIZE, page)
+            //     .map { Photo(id = it.id, url = it.medium640Url, title = it.title) }
+            //    .toMutableList()
 
-            photos.forEach {
-                PhotoRepository.get().add(it)
+            val photos = flickrRepository.searchPhotos(page, GRID_PAGE_SIZE).toMutableList()
+
+            CoroutineScope(Dispatchers.IO).launch {
+                flickrRepository.getFullMetadataForPhotos(photos).forEach {
+                    PhotoRepository.get().add(it)
+                }
             }
 
             return@async photos
@@ -259,19 +278,31 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
                 ViewModelProvider(this@ImageGridFragment).get(ImagesViewModel::class.java)
 
             val currentlist = listViewModel.currentImagesList.value
+            val currentSize = listViewModel.currentImagesList.value?.size
 
-            listViewModel.setImagesList(currentlist?.plus(photos) ?: photos)
+            val newList = currentlist?.plus(photos) ?: photos
+            if (page > 1)
+                listViewModel.setImagesList(newList)
+            else
+                listViewModel.setImagesList(photos)
 
             // build the recycler view and bind the adapter to it so we
             // can draw the individual images from the photo metadata
             // returned by the API
             recyclerView = binding.photosRecyclerView
-            recyclerView.adapter = PhotosAdapter(
-                this@ImageGridFragment,
-                listViewModel.currentImagesList.value!!.toMutableList()
-            )
+            (recyclerView.adapter as PhotosAdapter).photos.addAll(photos)
+
+            if (page > 1) {
+                (recyclerView.adapter as PhotosAdapter).notifyItemRangeChanged(
+                    currentSize!!,
+                    listViewModel.currentImagesList.value!!.size - 1
+                )
+            } else {
+                (recyclerView.adapter as PhotosAdapter).notifyDataSetChanged()
+            }
 
             binding.progress.visibility = View.GONE
+            binding.progressMore.visibility = View.GONE
         }
     }
 
@@ -279,7 +310,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
         const val IMAGE_GRID_PREFS = "ImageGridPrefs"
         const val IMAGE_IS_GRID = "ImagesIsGrid"
         const val ARG_USER_ID = "user_id"
-        const val GRID_PAGE_SIZE = 50
+        const val GRID_PAGE_SIZE = 12
         const val ROWS_PER_COLUMN_PORTRAIT = 2
         const val ROWS_PER_COLUMN_LANDSCAPE = 3
 

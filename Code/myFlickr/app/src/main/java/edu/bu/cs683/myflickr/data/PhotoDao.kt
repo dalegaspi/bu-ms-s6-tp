@@ -14,9 +14,14 @@ interface PhotoDao {
     @Update
     fun editProject(photo: Photo)
 
-    @Query("SELECT count(*) From photos")
-    fun count(): LiveData<Int>
+    @Query("select count(*) From photos")
+    fun count(): Int
 
-    @Query("SELECT * FROM photos")
-    fun getAllProjects(): LiveData<List<Photo>>
+    @Query("select * from photos")
+    fun getAllPhotos(): List<Photo>
+
+    @Query("select camera, count(*) as counts from photos group by camera limit 5")
+    fun getGroupCountsByCamera(): List<CameraCounts>
 }
+
+data class CameraCounts(var camera: String, var counts: Int)

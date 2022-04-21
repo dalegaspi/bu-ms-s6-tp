@@ -1,14 +1,19 @@
 package edu.bu.cs683.myflickr.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import edu.bu.cs683.myflickr.R
 import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.databinding.PhotoBinding
 import edu.bu.cs683.myflickr.listener.OneImageDetailListener
 
-class PhotosAdapter(val oneImageDetailListener: OneImageDetailListener, private val photos: MutableList<Photo> = mutableListOf()) : RecyclerView.Adapter<PhotosAdapter.PhotosViewHolder>() {
+class PhotosAdapter(
+    val oneImageDetailListener: OneImageDetailListener,
+    val photos: MutableList<Photo> = mutableListOf()
+) : RecyclerView.Adapter<PhotosAdapter.PhotosViewHolder>() {
     val IMAGE_SIDE_PX = 400
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotosViewHolder {
@@ -28,7 +33,15 @@ class PhotosAdapter(val oneImageDetailListener: OneImageDetailListener, private 
                     .load(url)
                     .fit()
                     .centerCrop()
+                    .placeholder(R.drawable.image_outline)
                     .into(binding.imageView)
+
+                if (!isPublic) {
+                    binding.imagePrivate.imageAlpha = 160
+                    binding.imagePrivate.visibility = View.VISIBLE
+                } else {
+                    binding.imagePrivate.visibility = View.INVISIBLE
+                }
             }
 
             contentView.setOnClickListener {

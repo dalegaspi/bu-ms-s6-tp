@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class ImageViewModel : ViewModel() {
-    private val _showMetadata = MutableLiveData<Boolean>(true)
+    private val _showMetadata = MutableLiveData<Boolean>(false)
     val showMetadata: LiveData<Boolean> get() = _showMetadata
 
     fun setShowMetadata(showMetadata: Boolean) {

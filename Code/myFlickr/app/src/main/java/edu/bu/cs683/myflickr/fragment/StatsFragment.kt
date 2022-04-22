@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.flickr4java.flickr.stats.Totals
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
@@ -14,7 +13,6 @@ import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import edu.bu.cs683.myflickr.MyFlickrApplication
 import edu.bu.cs683.myflickr.data.FlickrRepository
-import edu.bu.cs683.myflickr.data.Photo
 import edu.bu.cs683.myflickr.data.PhotoRepository
 import edu.bu.cs683.myflickr.databinding.FragmentStatsBinding
 import kotlinx.coroutines.*
@@ -64,7 +62,7 @@ class StatsFragment : Fragment() {
             barChart.axisLeft.granularity = 1f
             barChart.xAxis.labelCount = 5
             barChart.xAxis.setValueFormatter { value, a ->
-                  getAxis()[value.toInt() - 1]
+                getAxis()[value.toInt() - 1]
             }
             barChart.xAxis.setDrawGridLines(false)
             barChart.xAxis.setDrawAxisLine(false)
@@ -96,7 +94,7 @@ class StatsFragment : Fragment() {
         pieChart.setUsePercentValues(true)
         pieChart.description.text = ""
         // hollow pie chart
-        pieChart.isDrawHoleEnabled = false
+        pieChart.isDrawHoleEnabled = true
         pieChart.setTouchEnabled(false)
         pieChart.setDrawEntryLabels(false)
         // adding padding
@@ -131,7 +129,6 @@ class StatsFragment : Fragment() {
 
             pieChart.invalidate()
         }
-
     }
 
     override fun onCreateView(

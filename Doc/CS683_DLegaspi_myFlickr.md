@@ -18,12 +18,14 @@ BU MET MSSD
 - [Project Structure](#project-structure)
 - [Timeline](#timeline)
 - [Future Work (Optional)](#future-work--optional-)
+- [Project Demo Links](#project-demo-links)
 - [Lessons Learned and Other Notes](#lessons-learned-and-other-notes)
   * [Iteration 0](#iteration-0)
   * [Iteration 1](#iteration-1)
   * [Iteration 2](#iteration-2)
   * [Iteration 3](#iteration-3)
   * [Iteration 4](#iteration-4)
+  * [Iteration 5](#iteration-5)
   * [Screenshots](#screenshots)
 - [References](#references)
 
@@ -113,7 +115,7 @@ It would be nice to have some push notifications for any likes or increased view
 |Mockups| |
 |Acceptance Tests| User showing some infographic when they tap on |
 |Test Results| TBD |
-|Status| Iteration 3: Partially implemented|
+|Status| Iteration 5: Fully implemented|
 
 | Title(Essential/Desirable/Optional)| Auto-Hiding Toolbar in Images Grid(Essential) |
 |---|---|
@@ -154,7 +156,7 @@ A lot of the data will come via the Flickr API and will certainly leverage the a
 This is the initial directory structure of the project.  It only has the basic classes and artifacts that are generated using Android Studio IDE.  The Gradle script has been modified to add Third Party License references and Spotless plugin.
 
 
-![](dir4.png)
+![](final-dir.png)
 
 
 ## Timeline
@@ -163,18 +165,21 @@ This is the initial directory structure of the project.  It only has the basic c
 |---|---|---|
 |1|Authentication and Basic Image Browsing | Using Network connectivity and WebView for OAuth Handshake, using Flickr REST APIs|
 |2|Individual Image browsing (with Pinch to Zoom) and Graceful exit on API error|Fragments and RecyclerView|
-|3|Toolbars, Storing of Data in Local database, Charts,
-Preferences | ViewModel, SharedPreferences, Database|
-|4|Splash Screen, ProgressBar, Infinite Scrolling, Swipe Left/Right on Individual Image, Logout| Coroutines, ProgressBar, ViewPager|
-|5|Statistics| |
+|3|Toolbars, Storing of Data in Local database, Charts, Preferences | ViewModel, SharedPreferences, Database|
+|4|Splash Screen, ProgressBar, Infinite Scrolling, Swipe Left/Right on Individual Image, Logout|Coroutines, ProgressBar, ViewPager and ViewModel|
+|5|Statistics, Image Metadata, Auth Persistence and Optimizations|Room Integration, SharedPreferences and Saving to File, Dagger2|
 
 
 ## Future Work (Optional)
-*(This section can describe possible future works. Particularly the requirements you planned but didn’t get time to implement, and possible Android components or features to implement them. 
-This section is optional, and you can include this section in the final iteration if you want.)*
+
+- Refinement of infinite scrolling to use [Paging Library](https://developer.android.com/topic/libraries/architecture/paging/v3-overview)
+- Offline support.  Be able to do something even there is no network connection by using the local database and/or file system
+- I originally had a planned feature for filtering/grouping of images but had to drop it due to time constratints.
+- More statistics probably?
     
-##Project Demo Links
-*(For on campus students, we will have project presentations in class. For online students, you are required to submit a video of your project presentation which includes a demo of your app. You can use Kaltura to make the video and then submit it on blackboard. Please check the following link for the details of using Kaltura to make and submit videos on blackboard. You can also use other video tools and upload your video to youtube if you like: https://onlinecampus.bu.edu/bbcswebdav/courses/00cwr_odeelements/metcs/cs_Kaltura.htm  )*
+## Project Demo Links
+
+[High Level Demo](https://youtu.be/DYSbySOX8Zc)
 
 ## Lessons Learned and Other Notes
 
@@ -262,11 +267,66 @@ Additionally, pull down to refresh is also implemented with the aid of `SwipeRef
 - The statistics are still not wired to the data.  This will be done in the final iteration.
 - Last but not the least we have an app logo and a proper splash screen :-) The latest version of the Android SDK has made this essentially requiring no code at all to create [splash screens](https://developer.android.com/guide/topics/ui/splash-screen).
 
+### Iteration 5 
+
+This final iteration is all about refinements and tying lose ends:
+ 
+- Support for displaying Private images.  These images can only be seen by logged user and is indicated by a padlock icon.
+- Statistics is finally wired to the database using Room integration to do a query and convert it to a data structure that the MPAndroidChart can use to render the charts
+- Auth is now persisting session so it will no longer ask for permission every time you run the app.  This is using SharedPreferences
+
+```kotlin
+private fun savePrefs() {
+    val sharedPreferences = activity?.getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE)
+    sharedPreferences?.let {
+        Log.i(TAG, "Saving $AUTH_PREFS = $userId")
+        it.edit()
+            .putString(AUTH_PREFS, userId)
+            .apply()
+    }
+}
+
+private fun loadPrefs() {
+    val sharedPreferences = activity?.getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE)
+    sharedPreferences?.let {
+        userId = it.getString(AUTH_PREFS, "")
+        Log.i(TAG, "Setting from $AUTH_PREFS = $userId")
+    }
+}
+```
+
+- Infinite scrolling has been fixed so it will not scroll to start when it loads the next page and should stutter less. 
+- One-up left/right has been working in the last iteration but it blocks the UI to a large degree to the point that it freezes the UI; it also buggy that the swiping never takes you to the next image.  it's been fixed with a more proper use of co-routines.
+
+```kotlin
+suspend fun nextImage(): String {
+    val getImageJob = CoroutineScope(Dispatchers.IO).async {
+        val context = flickrRepository.getContext(imageId!!)
+
+        return@async context!!.previousPhoto.id
+    }
+
+    return getImageJob.await()
+}
+```
+- Using Dagger2 Dependency Injection to wrap the Flickr API
+
+```kotlin 
+@Singleton
+@Component
+public interface ApplicationGraph {
+    fun getFlickrRepository(): FlickrRepository
+}
+```
+
+
 ### Screenshots
 
 Login/Authorize App via Flickr OAuth
 
 ![](auth.png)
+
+![](auth2.png)
 
 Images Grid (Portrait)
 
@@ -280,9 +340,7 @@ Single Image Browsing
 
 ![](oneimage.png)
 
-New Grid (Iteration 3)
-
-![](newgrid.png)
+![](oneimage2.png)
 
 Linear Grid
 

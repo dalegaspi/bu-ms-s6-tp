@@ -59,10 +59,13 @@ class FlickrRepository @Inject constructor() {
         _authStore = FileAuthStore(File(baseDir, AUTHS_DIR))
     }
 
+    var avatarUrl = "https://www.flickr.com/images/buddyicon.gif"
+
     fun setSession(token: OAuth1AccessToken, user: User) {
         _authToken = token
         _user = user
         storeAuth()
+        setAvatarUrl()
     }
 
     fun hasActiveSession() = _auth != null
@@ -81,10 +84,16 @@ class FlickrRepository @Inject constructor() {
         RequestContext.getRequestContext().auth = auth
     }
 
+    fun setAvatarUrl() {
+        _user = this.flickr.peopleInterface.getInfo(user.id)
+        avatarUrl = user.secureBuddyIconUrl
+    }
+
     fun hydrateAuth(userId: String) {
         _auth = authStore.retrieve(userId)
         _user = auth.user
         RequestContext.getRequestContext().auth = auth
+        setAvatarUrl()
     }
 
     fun getPhotoWithFullMetadata(imageId: String): Photo {

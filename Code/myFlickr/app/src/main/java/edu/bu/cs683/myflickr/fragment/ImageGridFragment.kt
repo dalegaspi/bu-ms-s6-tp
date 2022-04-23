@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.squareup.picasso.Picasso
 import edu.bu.cs683.myflickr.MainActivity
 import edu.bu.cs683.myflickr.MyFlickrApplication
 import edu.bu.cs683.myflickr.R
@@ -34,6 +35,7 @@ import edu.bu.cs683.myflickr.data.PhotoRepository
 import edu.bu.cs683.myflickr.databinding.FragmentImageGridBinding
 import edu.bu.cs683.myflickr.listener.OneImageDetailListener
 import edu.bu.cs683.myflickr.viewmodel.ImagesViewModel
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -150,6 +152,10 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
         binding.showAppSettings.setOnClickListener {
             showAppOptions()
         }
+
+        binding.flickrProBadge.visibility = if (flickrRepository.user.isPro) View.VISIBLE else View.INVISIBLE
+        binding.profileName.text = flickrRepository.user.realName
+        Picasso.get().load(flickrRepository.avatarUrl).transform( CropCircleTransformation()).into(binding.buddyIcon)
     }
 
     @SuppressLint("UseSwitchCompatOrMaterialCode")

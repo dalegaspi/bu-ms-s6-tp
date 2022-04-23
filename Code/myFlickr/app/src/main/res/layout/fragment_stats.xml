@@ -8,6 +8,7 @@
     android:orientation="vertical"
     android:paddingHorizontal="20sp"
     android:paddingVertical="20sp"
+    android:background="@color/white"
     tools:context=".fragment.StatsFragment">
 
     <TextView
@@ -17,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Statistics"
+        android:textColor="@color/design_default_color_on_secondary"
         android:textSize="34sp" />
 
     <Space

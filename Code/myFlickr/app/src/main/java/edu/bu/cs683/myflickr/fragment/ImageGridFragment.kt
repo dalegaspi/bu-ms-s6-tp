@@ -155,7 +155,7 @@ class ImageGridFragment : Fragment(), OneImageDetailListener {
 
         binding.flickrProBadge.visibility = if (flickrRepository.user.isPro) View.VISIBLE else View.INVISIBLE
         binding.profileName.text = flickrRepository.user.realName
-        Picasso.get().load(flickrRepository.avatarUrl).transform( CropCircleTransformation()).into(binding.buddyIcon)
+        Picasso.get().load(flickrRepository.avatarUrl).transform(CropCircleTransformation()).into(binding.buddyIcon)
     }
 
     @SuppressLint("UseSwitchCompatOrMaterialCode")

@@ -75,5 +75,10 @@ dependencies {
 
     implementation 'com.google.dagger:dagger:2.41'
     kapt 'com.google.dagger:dagger-compiler:2.41'
+
+    implementation 'jp.wasabeef:picasso-transformations:2.4.0'
+
+
+
 }
 

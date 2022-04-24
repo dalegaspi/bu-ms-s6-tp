@@ -19,6 +19,7 @@
         android:visibility="gone" />
 
     <com.github.chrisbanes.photoview.PhotoView
+
         android:id="@+id/oneImageView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -101,6 +102,7 @@
             android:layout_marginLeft="10pt"
             android:layout_marginRight="10pt"
             android:layout_marginBottom="5pt"
+            android:checked="false"
             android:text="Show Metadata"
             android:textColor="@color/white"
             android:textSize="16sp" />

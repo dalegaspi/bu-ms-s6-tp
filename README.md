@@ -1,3 +1,3 @@
-# METCS683 Project 
+# METCS683 Term Project Project 
  
-- [Interation 0](https://github.com/CS683/metcs683projects-dalegaspi/releases/tag/Iteration-00)
+[Documenmtation](Doc/CS683_DLegaspi_myFlickr.md)

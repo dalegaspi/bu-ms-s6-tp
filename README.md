@@ -1,3 +1,5 @@
 # METCS683 Term Project Project 
  
-[Documenmtation](Doc/CS683_DLegaspi_myFlickr.md)
+[Documentation](Doc/CS683_DLegaspi_myFlickr.md)
+[Video High Level Demo](https://youtu.be/DYSbySOX8Zc)
+[Video Design Details Demo](https://youtu.be/qOkTPyLM2mQ)
